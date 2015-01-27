@@ -1,0 +1,340 @@
+%\VignetteIndexEntry{Introduction to the EGRET package}
+%\VignetteEngine{knitr::knitr}
+%\VignetteDepends{}
+%\VignetteSuggests{xtable, dataRetrieval,extrafont}
+%\VignetteImports{methods,survival, fields}
+%\VignettePackage{EGRET}
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage[numbers, round]{natbib}
+\usepackage[american]{babel}
+\usepackage{authblk}
+\usepackage{subfig}
+\usepackage{placeins}
+\usepackage{footnote}
+\usepackage{tabularx}
+\usepackage{parskip}
+\usepackage{threeparttable}
+\renewcommand\Affilfont{\itshape\small}
+
+\usepackage{csquotes}
+\usepackage{setspace}
+
+\doublespacing
+
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+\usepackage{graphicx}
+
+
+\usepackage{mathptmx}% Times Roman font
+\usepackage[scaled=.90]{helvet}% Helvetica, served as a model for arial
+
+\usepackage{indentfirst}
+\setlength{\parskip}{0pt}
+
+\usepackage{courier}
+
+\usepackage{titlesec}
+\usepackage{titletoc}
+
+\titleformat{\section}
+  {\normalfont\sffamily\bfseries\LARGE}
+  {\thesection}{0.5em}{}
+\titleformat{\subsection}
+  {\normalfont\sffamily\bfseries\Large}
+  {\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+  {\normalfont\sffamily\large}
+  {\thesubsubsection}{0.5em}{}
+  
+\titlecontents{section}
+[2em]                 % adjust left margin
+{\sffamily}             % font formatting
+{\contentslabel{2.3em}} % section label and offset
+{\hspace*{-2.3em}}
+{\titlerule*[0.25pc]{.}\contentspage}
+  
+\titlecontents{subsection}
+[4.6em]                 % adjust left margin
+{\sffamily}             % font formatting
+{\contentslabel{2.3em}} % section label and offset
+{\hspace*{-2.3em}}
+{\titlerule*[0.25pc]{.}\contentspage}
+  
+\titlecontents{subsubsection}
+[6.9em]                 % adjust left margin
+{\sffamily}             % font formatting
+{\contentslabel{2.3em}} % section label and offset
+{\hspace*{-2.3em}}
+{\titlerule*[0.25pc]{.}\contentspage}
+
+\titlecontents{table}
+[0em]                 % adjust left margin
+{\sffamily}             % font formatting
+{\textbf{Table}\hspace*{2em} \contentslabel {2em}} % section label and offset
+{\hspace*{4em}}
+{\titlerule*[0.25pc]{.}\contentspage}
+
+\titlecontents{figure}
+[0em]                 % adjust left margin
+{\sffamily}             % font formatting
+{\textbf{Figure}\hspace*{2em} \contentslabel {2em}} % section label and offset
+{\hspace*{4em}}
+{\titlerule*[0.25pc]{.}\contentspage}
+
+%Italisize and change font of urls:
+\urlstyle{sf}
+\renewcommand\UrlFont\itshape
+
+\usepackage{caption}
+\captionsetup{
+  font={sf},
+  labelfont={bf,sf},
+  labelsep=period,
+  justification=justified,
+  singlelinecheck=false
+}
+
+\setlength\parindent{20pt}
+
+\textwidth=6.5in
+\textheight=9.2in
+\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+%------------------------------------------------------------
+% newcommand
+%------------------------------------------------------------
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{\textit{#1}}
+\newcommand{\Rpackage}[1]{\textit{#1}}
+\newcommand{\Rexpression}[1]{\texttt{#1}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+
+\begin{document}
+
+\renewenvironment{knitrout}{\begin{singlespace}}{\end{singlespace}}
+\renewcommand*\listfigurename{Figures}
+\renewcommand*\listtablename{Tables}
+
+<<openLibrary, echo=FALSE>>=
+library(xtable)
+options(continue=" ")
+options(width=60)
+library(knitr)
+
+@
+
+
+<<include=TRUE ,echo=FALSE,eval=TRUE>>=
+opts_chunk$set(highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE, concordance=TRUE,tidy=FALSE,comment="")
+
+knit_hooks$set(inline = function(x) {
+   if (is.numeric(x)) round(x, 3)})
+knit_hooks$set(crop = hook_pdfcrop)
+
+bold.colHeaders <- function(x) {
+  x <- gsub("\\^(\\d)","$\\^\\1$",x)
+  x <- gsub("\\%","\\\\%",x)
+  x <- gsub("\\_"," ",x)
+  returnX <- paste("\\multicolumn{1}{c}{\\textbf{\\textsf{", x, "}}}", sep = "")
+}
+
+addSpace <- function(x) ifelse(x != "1", "[5pt]","")
+
+@
+
+%------------------------------------------------------------
+\title{Sample Title}
+%------------------------------------------------------------
+\author[1]{Laura De Cicco}
+\affil[1]{United States Geological Survey}
+
+% \maketitle
+
+\noindent{\huge\textsf{\textbf{Sample Title}}}
+
+\noindent\textsf{By Laura De Cicco}
+
+\newpage 
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\newpage
+
+
+%------------------------------------------------------------
+\section{Header 1}
+%------------------------------------------------------------ 
+
+Some text. With a url: \url{http://www.cida.usgs.gov}. More text.
+
+%------------------------------------------------------------
+\section{Header 2}
+%------------------------------------------------------------ 
+Blah blah
+
+
+<<workflowFlowHistory, echo=TRUE,eval=FALSE, message=FALSE>>=
+library(boot)
+
+# Some R code
+
+@
+
+
+
+%------------------------------------------------------------ 
+\section{Header 3}
+\label{sec:dataframes}
+%------------------------------------------------------------ 
+Text blah blah. Here's a table with xtable. Also, has a bit of formatting (in the ft$^3$/s).
+
+<<tableParameterCodes, echo=FALSE,results='asis'>>=
+pCode <- c('00060', '00065', '00010','00045','00400')
+shortName <- c("Discharge [ft$^3$/s]","Gage height [ft]","Temperature [C]", "Precipitation [in]", "pH")
+
+data.df <- data.frame(pCode, shortName, stringsAsFactors=FALSE)
+
+print(xtable(data.df,
+       label="tab:params",
+       caption="Common USGS Parameter Codes"),
+       caption.placement="top",
+       size = "\\footnotesize",
+       latex.environment=NULL,
+       sanitize.text.function = function(x) {x},
+       sanitize.colnames.function =  bold.colHeaders,
+       sanitize.rownames.function = addSpace
+      )
+
+@
+
+
+%------------------------------------------------------------ 
+\subsection{Subsection 1}
+\label{sec:dataframesDaily}
+%------------------------------------------------------------ 
+Here's a table without using xtable, table \ref{table:Daily1}).
+
+\begin{table}[!ht]
+{\footnotesize
+\caption{Daily dataframe} 
+\label{table:Daily1}
+\begin{tabular}{llll}
+  \hline
+\multicolumn{1}{c}{\textbf{\textsf{ColumnName}}} &
+\multicolumn{1}{c}{\textbf{\textsf{Type}}} &
+\multicolumn{1}{c}{\textbf{\textsf{Description}}} &
+\multicolumn{1}{c}{\textbf{\textsf{Units}}} \\ 
+  \hline
+  Date & Date & Date & date \\ 
+  [5pt]Q & number & Discharge in m\textsuperscript{3}/s & m\textsuperscript{3}/s \\ 
+  [5pt]Qualifier & string & Qualifing code & character \\ 
+  [5pt]Q7 & number & 7 day running average of Q & m\textsuperscript{3}/s \\ 
+  [5pt]Q30 & number & 30 running average of Q & m\textsuperscript{3}/s \\ 
+   \hline
+\end{tabular}
+}
+\end{table}
+
+\FloatBarrier
+
+There's also a table with a footnote.
+
+\begin{table}
+{\footnotesize
+  \begin{threeparttable}[b]
+  \caption{Sample dataframe}
+  \label{tab:SampleDataframe}
+  \begin{tabular}{llll}
+  \hline
+\multicolumn{1}{c}{\textbf{\textsf{ColumnName}}} & 
+\multicolumn{1}{c}{\textbf{\textsf{Type}}} & 
+\multicolumn{1}{c}{\textbf{\textsf{Description}}} & 
+\multicolumn{1}{c}{\textbf{\textsf{Units}}} \\ 
+  \hline
+  Date & Date & Date & date \\ 
+  [5pt]CosDY & number & Cosine of DecYear & numeric \\ 
+  [5pt]Q \tnote{1} & number & Discharge & m\textsuperscript{3}/s \\ 
+  [5pt]LogQ \tnote{1} & number & Natural logarithm of discharge & numeric \\ 
+   \hline
+\end{tabular}
+
+  \begin{tablenotes}
+    \item[1] Discharge columns are populated from data in the Daily dataframe after calling the \texttt{mergeReport} function.
+  \end{tablenotes}
+ \end{threeparttable}
+}
+\end{table}
+
+\FloatBarrier
+
+%------------------------------------------------------------ 
+\subsection{Subsection 2}
+\label{sec:dataframesSample}
+%------------------------------------------------------------ 
+
+\FloatBarrier
+
+
+%------------------------------------------------------------ 
+\section{Next Section}
+\label{sec:flowHistory}
+%------------------------------------------------------------ 
+
+
+We will walk through an example from Columbia River at The Dalles, OR.
+
+<<flowHistory,echo=TRUE,eval=TRUE,message=FALSE>>=
+#Some R stuff
+x <- 1
+@
+
+
+\FloatBarrier
+
+%------------------------------------------------------------ 
+\subsection{Plotting Options}
+\label{sec:plotOptions}
+%------------------------------------------------------------ 
+
+
+
+<<plotSingleandSD, echo=TRUE, fig.cap="Plots of discharge statistics",fig.subcap=c("plot(1:10)","plot(rnorm(10))"),out.width='.5\\linewidth',out.height='.5\\linewidth',fig.show='hold',fig.pos="h">>=
+plot(1:10)
+plot(rnorm(10))
+@
+
+\clearpage
+
+
+
+%------------------------------------------------------------ 
+\subsection{Plotting Options}
+\label{sec:plotOptionsWQ}
+%------------------------------------------------------------ 
+
+More text
+
+<<plotBoxes, echo=TRUE, fig.cap="Concentration box plots",out.width='.5\\linewidth',out.height='.5\\linewidth',fig.show='hold',fig.pos="h">>=
+plot(rnorm(10))
+@
+
+\clearpage
+
+
+
+\end{document}
