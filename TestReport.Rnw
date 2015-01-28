@@ -132,6 +132,7 @@ library(reshape2)
 library(USGSwsQW)
 library(EGRET)
 library(smwrGraphs)
+library(USGSHydroTools)
 @
 
 
@@ -186,6 +187,41 @@ load(file="pcodes.RData")
 load(file="sitesStage.RData")
 load(file="pCodeInfo.RData")
 @
+
+%------------------------------------------------------------
+\section{Introduction}
+%------------------------------------------------------------ 
+
+<<WImap, echo=FALSE, eval=TRUE, results='asis',fig.cap="Location of USGS lake water-quality, lake-stage, and lake-level network stations in Wisconsin">>=
+#Map boundaries:
+xmin <- -93
+xmax <- -86.6
+ymin <- 42
+ymax <- 47.1
+#Legend placement:
+xleft <- -92.8
+ytop <- 42.8
+
+siteTable <- read.csv("siteTable.csv", stringsAsFactors=FALSE)
+
+MapSizeColor(siteTable, colorVar="type",sizeVar=NA,
+             latVar = "dec_lat_va", lonVar = "dec_long_va",
+             xmin=xmin, xmax=xmax,
+             ymin=ymin, ymax=ymax,
+             xleft=xleft,ytop=ytop,
+             colVector=c("red","blue"),
+             includeLabels=FALSE, #Change this to TRUE, then start futzing with offset stuff
+             colText=expression(bold("EXPLANATION")),
+             LegCex=0.6
+#              .offsetLat="offsetLat",offsetLon="offsetLon",
+#              offsetLineLat="offsetLineLat",offsetLineLon="offsetLineLon",
+#              labels="map_nm"
+             )
+
+@
+
+\clearpage
+
 %------------------------------------------------------------
 \section{Lake Data}
 %------------------------------------------------------------ 
