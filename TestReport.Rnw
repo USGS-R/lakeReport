@@ -31,7 +31,9 @@
 \setlength{\parskip}{0pt}
 
 \usepackage{courier}
-
+\usepackage{fullpage}
+\usepackage{pdflscape}
+\usepackage{tabularx}
 \usepackage{titlesec}
 \usepackage{titletoc}
 
@@ -121,12 +123,16 @@
 \renewcommand*\listfigurename{Figures}
 \renewcommand*\listtablename{Tables}
 
-<<openLibrary, echo=FALSE>>=
+<<openLibrary, echo=FALSE, message=FALSE>>=
 library(xtable)
 options(continue=" ")
 options(width=60)
 library(knitr)
-
+library(reshape2)
+library(USGSwsQW)
+library(EGRET)
+library(smwrGraphs)
+library(USGSHydroTools)
 @
 
 
@@ -145,7 +151,7 @@ bold.colHeaders <- function(x) {
   x <- gsub("\\^(\\d)","$\\^\\1$",x)
   x <- gsub("\\%","\\\\%",x)
   x <- gsub("\\_"," ",x)
-  returnX <- paste("\\multicolumn{1}{c}{\\textbf{\\textsf{", x, "}}}", sep = "")
+  returnX <- paste0("\\multicolumn{1}{c}{\\textbf{\\textsf{", x, "}}}")
 }
 
 addSpace <- function(x) ifelse(x != "1", "[5pt]","")
@@ -179,13 +185,52 @@ load(file="stageData.RData")
 load(file="sites.RData")
 load(file="pcodes.RData")
 load(file="sitesStage.RData")
+load(file="pCodeInfo.RData")
 @
+
+%------------------------------------------------------------
+\section{Introduction}
+%------------------------------------------------------------ 
+
+<<WImap, echo=FALSE, eval=TRUE, results='asis',fig.cap="Location of USGS lake water-quality, lake-stage, and lake-level network stations in Wisconsin">>=
+#Map boundaries:
+xmin <- -93
+xmax <- -86.6
+ymin <- 42
+ymax <- 47.1
+#Legend placement:
+xleft <- -92.8
+ytop <- 42.8
+
+siteTable <- read.csv("siteTable.csv", stringsAsFactors=FALSE)
+
+MapSizeColor(siteTable, colorVar="type",sizeVar=NA,
+             latVar = "dec_lat_va", lonVar = "dec_long_va",
+             xmin=xmin, xmax=xmax,
+             ymin=ymin, ymax=ymax,
+             xleft=xleft,ytop=ytop,
+             colVector=c("red","blue"),
+             includeLabels=FALSE, #Change this to TRUE, then start futzing with offset stuff
+             colText=expression(bold("EXPLANATION")),
+             LegCex=0.6
+#              .offsetLat="offsetLat",offsetLon="offsetLon",
+#              offsetLineLat="offsetLineLat",offsetLineLon="offsetLineLon",
+#              labels="map_nm"
+             )
+
+@
+
+\clearpage
+
+%------------------------------------------------------------
+\section{Lake Data}
+%------------------------------------------------------------ 
 
 
 %------------------------------------------------------------
-\section{\Sexpr{sitesStage[1]} \Sexpr{siteTable[siteTable$site_no == sitesStage[1],"station_nm"]}}
+\subsection{\Sexpr{sitesStage[1]} \Sexpr{siteTable[siteTable$site_no == sitesStage[1],"station_nm"]}}
 %------------------------------------------------------------ 
-<<getSite1Data, echo=FALSE, eval=TRUE>>=
+<<getSite1DataStage, echo=FALSE, eval=TRUE>>=
 siteINFO <- siteTable[siteTable$site_no == sitesStage[1],]
 lat <- siteINFO$lat_va
 lon <- siteINFO$long_va
@@ -195,9 +240,8 @@ latSC <- substr(lat, 5,6)
 DA <- siteINFO$drain_area_va
 @
 
-LOCATION - Lat\Sexpr{latHR}\degree\Sexpr{latMN}\texttt{'}\Sexpr{latSC}\texttt{"}
-
-DRAINAGE AREA - \Sexpr{DA}
+LOCATION - Lat \Sexpr{latHR}\degree\Sexpr{latMN}\texttt{'}\Sexpr{latSC}\texttt{"}
+DRAINAGE AREA - \Sexpr{DA}mi$^2$
 
 <<stageTable, echo=FALSE,results='asis'>>=
 months <- c("Day","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep")
@@ -223,7 +267,7 @@ for(i in c(10:12,1:9)){
 names(data.df) <- months
 
 print(xtable(data.df,
-       label="tab:params",
+       label="tab:stage1",
        caption="Stage data"),
        caption.placement="top",
        size = "\\footnotesize",
@@ -235,7 +279,158 @@ print(xtable(data.df,
 
 @
 
+\clearpage
 
+\begin{landscape}
+%------------------------------------------------------------
+\subsection{\Sexpr{sites[1]} \Sexpr{siteTable[siteTable$site_no == sites[1],"station_nm"]}}
+%------------------------------------------------------------ 
+<<getSiteQW1Data, echo=FALSE, eval=TRUE>>=
+siteINFO <- siteTable[siteTable$site_no == sites[1],]
+lat <- siteINFO$lat_va
+lon <- siteINFO$long_va
+latHR <- substr(lat, 1, 2)
+latMN <- substr(lat, 3, 4)
+latSC <- substr(lat, 5,6)
+DA <- siteINFO$drain_area_va
+@
+
+
+
+LOCATION - Lat \Sexpr{latHR}\degree\Sexpr{latMN}\texttt{'}\Sexpr{latSC}\texttt{"}
+
+DRAINAGE AREA - \Sexpr{DA}mi$^2$
+
+
+<<qwTable, echo=FALSE,results='asis'>>=
+
+subData <- qwDataWQP[qwDataWQP$MonitoringLocationIdentifier == paste0("USGS-",sites[1]),]
+
+qwDataSite <- processQWData(subData)
+
+qwDataSite <- sapply(qwDataSite, as.character)
+qwDataSite[is.na(qwDataSite)] <- "--"
+
+uniquePcodes <- unique(sapply(strsplit(colnames(qwDataSite),"\\."),function(x) x[2]))
+uniquePcodes <- uniquePcodes[!is.na(uniquePcodes)]
+
+wideQW <- data.frame(date=qwDataSite[,1],stringsAsFactors=FALSE)
+namesVector <- "Date"
+for(i in uniquePcodes){
+  newCol <- apply(qwDataSite[,grep(i,colnames(qwDataSite))], 1, paste, collapse="")
+  wideQW <- cbind(wideQW, newCol)
+  namesVector <- cbind(namesVector, 
+                       paste(pCodeInfo$srsname[pCodeInfo$parameter_cd == i],
+                              pCodeInfo$parameter_units[pCodeInfo$parameter_cd == i],
+                              i))
+}
+
+names(wideQW) <- namesVector
+
+firstTable <- xtable(wideQW[,1:9],
+       label="tab:QW1",
+       caption="Water-quality data"
+       )
+align(firstTable) <- "lXXXXXXXXX"
+print(firstTable,
+       caption.placement="top",
+       size = "\\footnotesize",
+       latex.environment=NULL,
+       tabular.environment="tabularx",
+       width="\\linewidth",
+#        sanitize.text.function = function(x) {x},
+#        sanitize.colnames.function =  bold.colHeaders,
+       sanitize.rownames.function = addSpace
+      )
+
+secondTable <- xtable(wideQW[,c(1,10:ncol(wideQW))],
+       label="tab:QW2"
+       )
+align(secondTable) <- "lXXXXXXX"
+print(secondTable,
+       caption.placement="top",
+       size = "\\footnotesize",
+       latex.environment=NULL,
+       tabular.environment="tabularx",
+       width="\\linewidth",
+#        sanitize.text.function = function(x) {x},
+#        sanitize.colnames.function =  bold.colHeaders,
+       sanitize.rownames.function = addSpace
+      )
+
+
+@
+
+
+\clearpage
+
+%------------------------------------------------------------
+\subsection{\Sexpr{sites[1]} \Sexpr{siteTable[siteTable$site_no == sites[1],"station_nm"]} Lake-Depth Profiles}
+%------------------------------------------------------------ 
+
+<<site1Profiles, echo=FALSE, eval=TRUE>>=
+  
+i <- sites[1]
+subData <- subData[subData$USGSPCode %in% c("00010","00300"),]
+numGraphs <- length(unique(subData$ActivityStartDate))
+
+if(numGraphs > 10) {
+  numRows <- ceiling(numGraphs/5)
+  numCol <- 5
+} else if (numGraphs <= 5) {
+  numRows <- 1
+  numCol <- numGraphs
+} else if (numGraphs > 5 & numGraphs <= 10){
+  numRows <- 2
+  numCol <- ceiling(numGraphs/2)
+}
+yLabIndex <- seq(1,by = numCol, length.out = numRows)
+
+baseName <- paste0(i,"_LAKE_DEPTH_PROFILES")
+setSweave(file.path("figure",baseName),10,5)
+layoutResponse <- setLayout(num.rows=numRows,num.cols = numCol, 
+                            num.graphs = numGraphs)
+for(dateIndex in 1:numGraphs){
+  date <- unique(subData$ActivityStartDate)[dateIndex]
+  subDataDate <- subset(subData, ActivityStartDate==date)
+  wTemp <- which(subDataDate$USGSPCode %in% "00010")
+  doInext <- which(subDataDate$USGSPCode %in% "00300")
+  graph1 <- setGraph(dateIndex, layoutResponse)
+  graph1 <- setTopMargin(graph1)
+  yLabel <- ifelse(dateIndex %in% yLabIndex,"DEPTH, IN METERS","")
+  
+  plotReturn <- xyPlot(subDataDate$ResultMeasureValue[wTemp], 
+                         subDataDate$ActivityDepthHeightMeasure.MeasureValue[wTemp], 
+                         Plot=list(name="Water Temperature (C)", 
+                                   what="line",type="dashed"),
+                         xtitle="",
+                         ytitle=yLabel,
+                         xaxis.range=c(0,30),margin=graph1)
+    
+  plotReturn <- addXY(subDataDate$ResultMeasureValue[doInext], 
+          subDataDate$ActivityDepthHeightMeasure.MeasureValue[doInext],
+          Plot=list(name="Dissolved Oxygen"),
+          new.axis="top",new.title=date, current=plotReturn)
+  if(dateIndex == 1){
+#     addTitle(Main = paste0("Lake-Depth Profiles, ", 
+#                   paste(range(unique(subData$ActivityStartDate)),collapse=" to ")))
+          addExplanation(plotReturn, where="ul")
+  }
+  
+}
+graphics.off()
+
+Main = paste0("Lake-Depth Profiles, ", 
+                  paste(range(unique(subData$ActivityStartDate)),collapse=" to "))
+
+@
+
+\begin{figure}[h]
+\includegraphics{figure/\Sexpr{baseName}.pdf}
+\caption{\Sexpr{Main}}
+\end{figure}
+
+\end{landscape}
 
 %------------------------------------------------------------
 \section{Header 2}
@@ -244,7 +439,7 @@ Blah blah
 
 
 <<workflowFlowHistory, echo=TRUE,eval=FALSE, message=FALSE>>=
-library(smwrGraphs)
+
 
 # Some R code
 
