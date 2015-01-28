@@ -16,8 +16,8 @@ if(numGraphs > 10) {
 }
 yLabIndex <- seq(1,by = numCol, length.out = numRows)
 
-
-setPDF(layout = "landscape", basename = paste0(i,"LAKE_DEPTH_PROFILES"))
+baseName <- paste0(i,"LAKE_DEPTH_PROFILES")
+setSweave(file.path("figure",baseName),11,8)
 layoutResponse <- setLayout(num.rows=numRows,num.cols = numCol, 
                             num.graphs = numGraphs)
 for(dateIndex in 1:numGraphs){
