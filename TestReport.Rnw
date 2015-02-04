@@ -284,7 +284,7 @@ print(xtable(data.df,
 \begin{landscape}
 
 <<getSiteQW1Data, echo=FALSE, eval=TRUE>>=
-sitesIndex <- 2
+sitesIndex <- 1
 siteINFO <- siteTable[siteTable$site_no == sites[sitesIndex],]
 lat <- siteINFO$lat_va
 lon <- siteINFO$long_va
@@ -312,16 +312,18 @@ subData <- qwDataWQP[qwDataWQP$MonitoringLocationIdentifier == paste0("USGS-",si
 
 qwDataSite <- processQWData(subData)
 
-qwDataSite <- sapply(qwDataSite, as.character)
+qwDataSite[] <- lapply(qwDataSite, as.character)
 qwDataSite[is.na(qwDataSite)] <- "--"
 
-uniquePcodes <- unique(sapply(strsplit(colnames(qwDataSite),"\\."),function(x) x[2]))
+qwDataSite <- data.frame(qwDataSite, stringsAsFactors=FALSE)
+
+uniquePcodes <- unique(sapply(strsplit(names(qwDataSite),"\\."),function(x) x[2]))
 uniquePcodes <- uniquePcodes[!is.na(uniquePcodes)]
 
-wideQW <- data.frame(date=qwDataSite[,1],stringsAsFactors=FALSE)
+wideQW <- data.frame(date=qwDataSite[1],stringsAsFactors=FALSE)
 namesVector <- "Date"
 for(i in uniquePcodes){
-  newCol <- apply(qwDataSite[,grep(i,colnames(qwDataSite))], 1, paste, collapse="")
+  newCol <- apply(qwDataSite[,grep(i,names(qwDataSite))], 1, paste, collapse="")
   wideQW <- cbind(wideQW, newCol)
   namesVector <- cbind(namesVector, 
                        paste(pCodeInfo$srsname[pCodeInfo$parameter_cd == i],
@@ -330,37 +332,54 @@ for(i in uniquePcodes){
 }
 
 names(wideQW) <- namesVector
+totalCols <- ncol(wideQW)
 
-firstTable <- xtable(wideQW[,1:9],
-       label="tab:QW1",
-       caption="Water-quality data"
-       )
-align(firstTable) <- "lXXXXXXXXX"
-print(firstTable,
-       caption.placement="top",
-       size = "\\footnotesize",
-       latex.environment=NULL,
-       tabular.environment="tabularx",
-       width="\\linewidth",
-#        sanitize.text.function = function(x) {x},
-#        sanitize.colnames.function =  bold.colHeaders,
-       sanitize.rownames.function = addSpace
-      )
-
-secondTable <- xtable(wideQW[,c(1,10:ncol(wideQW))],
-       label="tab:QW2"
-       )
-align(secondTable) <- "lXXXXXXX"
-print(secondTable,
-       caption.placement="top",
-       size = "\\footnotesize",
-       latex.environment=NULL,
-       tabular.environment="tabularx",
-       width="\\linewidth",
-#        sanitize.text.function = function(x) {x},
-#        sanitize.colnames.function =  bold.colHeaders,
-       sanitize.rownames.function = addSpace
-      )
+if(totalCols > 10){
+  firstTable <- xtable(wideQW[,1:9],
+         label="tab:QW1",
+         caption="Water-quality data"
+         )
+  align(firstTable) <- "lXXXXXXXXX"
+  print(firstTable,
+         caption.placement="top",
+         size = "\\footnotesize",
+         latex.environment=NULL,
+         tabular.environment="tabularx",
+         width="\\linewidth",
+         sanitize.rownames.function = addSpace
+        )
+  
+  secondTable <- xtable(wideQW[,c(1,10:ncol(wideQW))],
+         label="tab:QW2"
+         )
+  alignText <-  paste0(rep("X",times = totalCols-8),collapse="")
+  alignText <-  paste0("l",alignText)
+  align(secondTable) <- alignText
+  print(secondTable,
+         caption.placement="top",
+         size = "\\footnotesize",
+         latex.environment=NULL,
+         tabular.environment="tabularx",
+         width="\\linewidth",
+         sanitize.rownames.function = addSpace
+        )
+} else {
+    firstTable <- xtable(wideQW,
+         label="tab:QW1",
+         caption="Water-quality data"
+         )
+  alignText <-  paste0(rep("X",times = totalCols),collapse="")
+  alignText <-  paste0("l",alignText)
+  align(firstTable) <- alignText
+  print(firstTable,
+         caption.placement="top",
+         size = "\\footnotesize",
+         latex.environment=NULL,
+         tabular.environment="tabularx",
+         width="\\linewidth",
+         sanitize.rownames.function = addSpace
+        )
+}
 
 
 @
