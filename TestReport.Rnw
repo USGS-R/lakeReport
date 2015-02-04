@@ -228,7 +228,7 @@ MapSizeColor(siteTable, colorVar="type",sizeVar=NA,
 
 
 %------------------------------------------------------------
-\subsection{\Sexpr{sitesStage[1]} \Sexpr{siteTable[siteTable$site_no == sitesStage[1],"station_nm"]}}
+\subsection{\Sexpr{sitesStage[1]} hello? \Sexpr{siteTable[siteTable$site_no == sitesStage[1],"station_nm"]}}
 %------------------------------------------------------------ 
 <<getSite1DataStage, echo=FALSE, eval=TRUE>>=
 siteINFO <- siteTable[siteTable$site_no == sitesStage[1],]
@@ -282,11 +282,10 @@ print(xtable(data.df,
 \clearpage
 
 \begin{landscape}
-%------------------------------------------------------------
-\subsection{\Sexpr{sites[1]} \Sexpr{siteTable[siteTable$site_no == sites[1],"station_nm"]}}
-%------------------------------------------------------------ 
+
 <<getSiteQW1Data, echo=FALSE, eval=TRUE>>=
-siteINFO <- siteTable[siteTable$site_no == sites[1],]
+sitesIndex <- 2
+siteINFO <- siteTable[siteTable$site_no == sites[sitesIndex],]
 lat <- siteINFO$lat_va
 lon <- siteINFO$long_va
 latHR <- substr(lat, 1, 2)
@@ -294,6 +293,11 @@ latMN <- substr(lat, 3, 4)
 latSC <- substr(lat, 5,6)
 DA <- siteINFO$drain_area_va
 @
+
+
+%------------------------------------------------------------
+\subsection{\Sexpr{sites[sitesIndex]} \Sexpr{siteTable[siteTable$site_no == sites[sitesIndex],"station_nm"]}}
+%------------------------------------------------------------ 
 
 
 
@@ -304,7 +308,7 @@ DRAINAGE AREA - \Sexpr{DA}mi$^2$
 
 <<qwTable, echo=FALSE,results='asis'>>=
 
-subData <- qwDataWQP[qwDataWQP$MonitoringLocationIdentifier == paste0("USGS-",sites[1]),]
+subData <- qwDataWQP[qwDataWQP$MonitoringLocationIdentifier == paste0("USGS-",sites[sitesIndex]),]
 
 qwDataSite <- processQWData(subData)
 
