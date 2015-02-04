@@ -1,3 +1,7 @@
+install.packages(c("smwrGraphs"), 
+                 repos=c("http://usgs-r.github.com","http://cran.us.r-project.org"), 
+                 dependencies=TRUE)
+
 library(smwrGraphs)
 load("oneSite.RData")
 
