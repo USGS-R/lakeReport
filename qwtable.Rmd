@@ -6,7 +6,6 @@ classoption: landscape
 library(dataRetrieval)
 library(dplyr)
 library(tidyr)
-library(knitr)
 
 #load functions
 makeWqTable <- function(qw_nwis){
@@ -61,6 +60,18 @@ qwtable <- makeWqTable(qw_nwis)
 
 LOCATION.--Lat `r getAttr(qw_nwis, 'dec_lat_va')`, long `r getAttr(qw_nwis, 'dec_long_va')` 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE} 
+`r isWord <- output == "word"`
+```{r eval = !isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(xtable)
+
+qwtable$sample_dt <- as.character(qwtable$sample_dt)
+
+options(xtable.comment = FALSE)
+qw_xtable <- xtable(qwtable, caption = table_caption, auto=TRUE)
+print.xtable(qw_xtable, NA.string = "--")
+```
+
+```{r eval = isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(knitr)
 kable(qwtable, caption = table_caption)
 ```

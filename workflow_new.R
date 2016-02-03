@@ -15,7 +15,7 @@
 
 ## generating PDFs workflow
 
-renderLakeReports <- function(reportName, siteNumber, wy, output){
+renderLakeReport <- function(reportName, siteNumber, wy, output){
   library(rmarkdown)
   
   output_dir <- getwd()
@@ -28,21 +28,21 @@ renderLakeReports <- function(reportName, siteNumber, wy, output){
   return(out_file)
 }
 
-#example workflow:
+#example workflow (after running code for renderLakeReport function):
 
 ##rendering as pdf
-renderLakeReports('ghtable', '05390500', 2014, 'pdf')
-renderLakeReports('stagehydrograph', '05390500', 2014, 'pdf')
-renderLakeReports('qwtable', "455638089034501", 2014, 'pdf')
-renderLakeReports('depthprofiles', "455638089034501", 2014, 'pdf')
-renderLakeReports('qwtimeseries', "455638089034501", 2014, 'pdf')
+renderLakeReport('ghtable', '05390500', 2014, 'pdf')
+renderLakeReport('stagehydrograph', '05390500', 2014, 'pdf')
+renderLakeReport('qwtable', "455638089034501", 2014, 'pdf')
+renderLakeReport('depthprofiles', "455638089034501", 2014, 'pdf')
+renderLakeReport('qwtimeseries', "455638089034501", 2014, 'pdf')
 
 ## rendering as word docs (tables don't have nice formatting)
-renderLakeReports('ghtable', '05390500', 2014, 'word')
-renderLakeReports('stagehydrograph', '05390500', 2014, 'word')
-renderLakeReports('qwtable', "455638089034501", 2014, 'word')
-renderLakeReports('depthprofiles', "455638089034501", 2014, 'word')
-renderLakeReports('qwtimeseries', "455638089034501", 2014, 'word')
+renderLakeReport('ghtable', '05390500', 2014, 'word')
+renderLakeReport('stagehydrograph', '05390500', 2014, 'word')
+renderLakeReport('qwtable', "455638089034501", 2014, 'word')
+renderLakeReport('depthprofiles', "455638089034501", 2014, 'word')
+renderLakeReport('qwtimeseries', "455638089034501", 2014, 'word')
 
 #####################################################################################
 

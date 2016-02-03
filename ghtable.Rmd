@@ -4,7 +4,6 @@ library(dataRetrieval)
 library(lubridate)
 library(dplyr)
 library(tidyr)
-library(knitr)
 
 #load functions
 makeGageHeightTable <- function(stage_data, wy_start){
@@ -62,6 +61,13 @@ ghtable <- makeGageHeightTable(stage_data, wy_start)
 
 LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE} 
+`r isWord <- output == "word"`
+```{r eval=!isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(xtable)
+xtable(ghtable, caption = table_caption, auto=TRUE)
+```
+
+```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(knitr)
 kable(ghtable, caption = table_caption)
 ```
