@@ -1,0 +1,66 @@
+---
+classoption: landscape
+---
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+library(dataRetrieval)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+#load functions
+makeWqTable <- function(qw_nwis){
+  
+  qw_table <- qw_nwis %>% 
+    select(sample_dt, sample_tm, result_va, parm_cd) %>%
+    group_by(sample_dt) %>% 
+    spread(key = parm_cd, value = result_va) 
+  
+  col_order <- c("sample_dt", "sample_tm", "00078", "00098", "00010", "00095", "00400", "00300", 
+                 "32210", "00665", "00666", "00671", "00600", "00608", "00623", "00625", "00631")
+  qw_table <- qw_table[, match(col_order, names(qw_table))]
+  
+  return(qw_table)
+}
+
+getAttr <- function(data, attr_nm){
+  attributes(data)$siteInfo[[attr_nm]]
+}
+
+formatDate <- function(date){
+  paste0(month(date, label=T, abbr=F), " ", 
+         day(date), ", ",
+         year(date))
+}
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
+wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+
+pcodes <- read.csv("pcodes.lakes1",header=FALSE,
+                   colClasses = "character")[,1]
+
+qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
+                      parameterCd = pcodes, 
+                      startDate = wy_start, 
+                      endDat = wy_end)
+
+station_nm <- attributes(qw_nwis)$siteInfo$station_nm
+site_no <- attributes(qw_nwis)$siteInfo$site_no
+table_caption <- paste0("WATER-QUALITY DATA, ", 
+                        formatDate(qw_nwis$sample_dt[1]), " TO ",
+                        formatDate(tail(qw_nwis$sample_dt, 1)), 
+                        "\n(Milligrams per liter unless otherwise indicated)")
+last_index <- length(qw_nwis$sample_dt)
+
+qwtable <- makeWqTable(qw_nwis)
+```
+
+`r getAttr(qw_nwis, 'site_no')` `r getAttr(qw_nwis, 'station_nm')`
+
+LOCATION.--Lat `r getAttr(qw_nwis, 'dec_lat_va')`, long `r getAttr(qw_nwis, 'dec_long_va')` 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE} 
+kable(qwtable, caption = table_caption)
+```

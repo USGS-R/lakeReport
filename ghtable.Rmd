@@ -1,5 +1,12 @@
 
-### gage height table ###
+```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+library(dataRetrieval)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+#load functions
 makeGageHeightTable <- function(stage_data, wy_start){
   wy_months <- month.abb[c(10,11,12, 1:9)]
   
@@ -30,21 +37,31 @@ makeGageHeightTable <- function(stage_data, wy_start){
   return(gh_table_final)
 }
 
-### stage hydrograph ###
-makeStageHydrograph <- function(stage_data){
-  gage_height_obs <- stage_data %>% 
-    select(dateTime, X_OBSERVER_00065_00003) %>% 
-    filter(!is.na(X_OBSERVER_00065_00003)) %>% 
-    rename(gageHeight = X_OBSERVER_00065_00003)
-  gage_height_cont <- stage_data %>% 
-    select(dateTime, X_.CONTINUOUS._00065_00003) %>% 
-    filter(!is.na(X_.CONTINUOUS._00065_00003)) %>% 
-    rename(gageHeight = X_.CONTINUOUS._00065_00003)
-  gage_height_all <- rbind(gage_height_obs, gage_height_cont)
-    
-  stageHydrograph <- gsplot() %>% 
-    lines(gage_height_all$dateTime, gage_height_all$gageHeight) %>% 
-    title(ylab = "GAGE HEIGHT, IN FEET")
-  
-  return(stageHydrograph)
+getAttr <- function(data, attr_nm){
+  attributes(data)$siteInfo[[attr_nm]]
 }
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
+wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+
+stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
+                           parameterCd = "00065", startDate = "1800-01-01", 
+                           endDate = wy_end)
+
+station_nm <- attributes(stage_data)$siteInfo$station_nm
+site_no <- attributes(stage_data)$siteInfo$site_no
+table_caption <- paste0("GAGE HEIGHT, FEET\nWATER YEAR OCTOBER", wy-1, " TO ", wy, "\nDAILY MEAN VALUES")
+last_index <- length(stage_data$dateTime)
+
+ghtable <- makeGageHeightTable(stage_data, wy_start) 
+```
+
+`r getAttr(stage_data, 'site_no')` `r getAttr(stage_data, 'station_nm')`
+
+LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE} 
+kable(ghtable, caption = table_caption)
+```
