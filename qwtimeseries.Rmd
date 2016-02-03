@@ -13,15 +13,26 @@ library(gsplot)
 filterParmData <- function(data, pcode){
   data %>% 
     filter(parm_cd == pcode) %>% 
-    select(sample_dt, result_va)
+    select(sample_dt, result_va, coll_ent_cd)
 }
 
 makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
   if(!isTrophicIndex){
+    usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
+    observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
+    
     parm_plot <- gsplot() %>% 
-      points(x = parm_data$sample_dt, y = parm_data$result_va, 
-             xlab = "", ylab = title, pch = 20) %>% 
+      points(x = usgs$sample_dt, y = usgs$result_va, 
+             xlab = "", ylab = title, legend.name = "USGS",
+             pch = 18, col = "black") %>% 
+      points(x = observer$sample_dt, y = observer$result_va, 
+             xlab = "", legend.name = "Observer",
+             pch = 1, col = "black") %>%
       axis(side=2, reverse = axisFlip)
+    if(length(grep("PHOSPHORUS", title)) > 0){ 
+      parm_plot <- parm_plot %>%
+        legend()
+    }
   } else {
     parm_plot <- gsplot() %>% 
       points(x = NA, y = NA, 
@@ -44,7 +55,7 @@ qw_historic <- readNWISqw(siteNumbers = siteNumber,
 
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.height = 15, fig.width=9} 
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.height = 14, fig.width=11} 
 totalP <- filterParmData(qw_historic, "00665") 
 chlorophyll <- filterParmData(qw_historic, "32210")
 secchi <- filterParmData(qw_historic, "00078")
@@ -54,6 +65,9 @@ totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
 chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
 trophic_title <- "TROPHIC STATE INDEX"
+
+par(oma = c(1,4,4,0) + 0.1,
+    mar = c(2,2,4,0) + 0.1)
 
 plot_layout <- matrix(1:4, 4, 1)
 layout(plot_layout)

@@ -1,7 +1,6 @@
 ---
 classoption: landscape
 ---
-
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 library(dataRetrieval)
 library(dplyr)
@@ -64,7 +63,6 @@ depthProfilePlot <- function(side1, side3, filter_date, top,
   side3_list <- filterByDate(side3, filter_date)
   
   title_main <- ifelse(top, as.character(filter_date), "")
-  ylab_left <- ifelse(left, "DEPTH, IN METERS", "")
   
   smartTicks <- function(vals, yaxis, top){
     vals <- na.omit(vals)
@@ -88,7 +86,7 @@ depthProfilePlot <- function(side1, side3, filter_date, top,
     axis(side=4, reverse=TRUE, labels=FALSE, n.minor=1, at=yticks$at_vals) %>% 
     axis(side=1, at=xticks_1$at_vals, n.minor=xticks_1$nminor) %>% 
     axis(side=3, at=xticks_3$at_vals, n.minor=xticks_3$nminor) %>% 
-    title(main = title_main, ylab = ylab_left)
+    title(main = title_main, line = 4)
   
   return(gs)
 }
@@ -125,11 +123,7 @@ last_index <- length(qw_nwis$sample_dt)
 prof_data <- makeLakeDepthProfiles(qw_nwis)
 ```
 
-`r getAttr(qw_nwis, 'site_no')` `r getAttr(qw_nwis, 'station_nm')`
-
-LOCATION.--Lat `r getAttr(qw_nwis, 'dec_lat_va')`, long `r getAttr(qw_nwis, 'dec_long_va')` 
-
-```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'} 
+```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
 #grab data from big list
 dates_uniq <- prof_data$dates_uniq
 DO <- prof_data$DO
@@ -146,14 +140,17 @@ specifcond_title <- "SPECIFIC CONDUCTANCE (S.C.) IN MICROSIEMENS PER CENTIMETER 
 num_2x4_plots <- floor(length(dates_uniq)/4)
 num_extra_dates <- length(dates_uniq)%%4
 
+#set plot options for margins
+par(oma = c(5,4,4,0) + 0.1,
+    mar = c(1,1,5,1) + 0.1)
+
 #2x4 plots
 d <- 1
-plotList <- list()
 for(p in seq(num_2x4_plots)){
   if(p > 1){cat("\n\\newpage\n")}
   dts <- dates_uniq[d:(p*4)]
+
   plot_setup <- matrix(1:8, 2, 4)
-  
   layout(plot_setup)
   for(t in seq_along(dts)){
     left_logic <- t == 1
@@ -163,8 +160,21 @@ for(p in seq(num_2x4_plots)){
                            PH_title, specifcond_title, left_logic))
   }
   
+  #add titles around the plot
+  title(ylab = "DEPTH, IN METERS",
+        outer = TRUE, line = 2)
+  title(xlab = specifcond_title,
+        outer = TRUE, line = 1)
+  title(xlab = PH_title,
+        outer = TRUE, line = -17)
+  title(xlab = h2otemp_title,
+        outer = TRUE, line = -19.5)
+  title(xlab = DO_title,
+        outer = TRUE, line = -37.5)
+
   d <- (p*4)+1
 }
+
 
 #extras 
 dts <- tail(dates_uniq, num_extra_dates)
@@ -180,6 +190,19 @@ if(length(dts) > 0){
     print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE,
                            PH_title, specifcond_title, left_logic))
   }
+  
+    #add titles around the plot
+  title(ylab = "DEPTH, IN METERS",
+        outer = TRUE, line = 3)
+  title(xlab = specifcond_title,
+        outer = TRUE, line = 1)
+  title(xlab = PH_title,
+        outer = TRUE, line = -12)
+  title(xlab = h2otemp_title,
+        outer = TRUE, line = -25)
+  title(xlab = DO_title,
+        outer = TRUE, line = -27)
+
 }
 
 ## still working on lake-depth profiles
