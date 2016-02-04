@@ -11,14 +11,14 @@ makeGageHeightTable <- function(stage_data, wy_start){
   
   gh_table <- stage_data %>% 
     filter(dateTime >= wy_start) %>% 
-    select(dateTime, X_.CONTINUOUS._00065_00003) %>% 
+    select(dateTime, ends_with("_00065_00003"), -starts_with("X_OBSERVER")) %>% 
     mutate(Month = factor(month(dateTime, label = TRUE, abbr = TRUE), 
                           levels = wy_months, ordered = TRUE)) 
   
   gh_table_months <- gh_table %>% 
     mutate(Day = format(dateTime, "%d")) %>%
-    select(Day, Month, X_.CONTINUOUS._00065_00003) %>% 
-    spread(Month, X_.CONTINUOUS._00065_00003)
+    select(Day, Month, gageHeight = ends_with("_00065_00003")) %>%
+    spread(Month, gageHeight)
   
   stats_mean <- gh_table_months %>% 
     summarize_each(funs = funs(mean(., na.rm = TRUE)), vars = -1) %>% 
@@ -51,23 +51,33 @@ stage_data <- readNWISdata(service = "dv", sites = siteNumber,
 
 station_nm <- attributes(stage_data)$siteInfo$station_nm
 site_no <- attributes(stage_data)$siteInfo$site_no
-table_caption <- paste0("GAGE HEIGHT, FEET\nWATER YEAR OCTOBER", wy-1, " TO ", wy, "\nDAILY MEAN VALUES")
 last_index <- length(stage_data$dateTime)
 
 ghtable <- makeGageHeightTable(stage_data, wy_start) 
 ```
 
-`r getAttr(stage_data, 'site_no')` `r getAttr(stage_data, 'station_nm')`
+## `r getAttr(stage_data, 'site_no')` `r getAttr(stage_data, 'station_nm')`
 
-LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
+### LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
+
+*****
+
+GAGE HEIGHT, FEET
+
+`r paste("WATER YEAR OCTOBER", wy-1, "TO SEPTEMBER", wy)`
+
+DAILY MEAN VALUES
 
 `r isWord <- output == "word"`
 ```{r eval=!isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(xtable)
-xtable(ghtable, caption = table_caption, auto=TRUE)
+options(xtable.comment = FALSE)
+
+gh_xtable <- xtable(ghtable, auto=TRUE)
+print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
 ```
 
 ```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(knitr)
-kable(ghtable, caption = table_caption)
+kable(ghtable)
 ```
