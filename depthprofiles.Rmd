@@ -179,11 +179,11 @@ for(p in seq(num_2x4_plots)){
 #extras 
 dts <- tail(dates_uniq, num_extra_dates)
 if(length(dts) > 0){
-  plot_setup <- matrix(1:(2*num_extra_dates), 2, num_extra_dates)
+  cat("\n\\newpage\n")
   
+  plot_setup <- matrix(1:(2*num_extra_dates), 2, num_extra_dates)
   layout(plot_setup)
   for(t in seq_along(dts)){
-    cat("/newpage")
     left_logic <- t == 1
     print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
                            DO_title, h2otemp_title, left_logic))
