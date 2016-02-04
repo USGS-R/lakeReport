@@ -181,7 +181,7 @@ dts <- tail(dates_uniq, num_extra_dates)
 if(length(dts) > 0){
   cat("\n\\newpage\n")
   
-  plot_setup <- matrix(1:(2*num_extra_dates), 2, num_extra_dates)
+  plot_setup <- matrix(1:8, 2, 4)
   layout(plot_setup)
   for(t in seq_along(dts)){
     left_logic <- t == 1
@@ -191,17 +191,17 @@ if(length(dts) > 0){
                            PH_title, specifcond_title, left_logic))
   }
   
-    #add titles around the plot
+  #add titles around the plot
   title(ylab = "DEPTH, IN METERS",
-        outer = TRUE, line = 3)
+        outer = TRUE, line = 2)
   title(xlab = specifcond_title,
         outer = TRUE, line = 1)
   title(xlab = PH_title,
-        outer = TRUE, line = -12)
+        outer = TRUE, line = -17)
   title(xlab = h2otemp_title,
-        outer = TRUE, line = -25)
+        outer = TRUE, line = -19.5)
   title(xlab = DO_title,
-        outer = TRUE, line = -27)
+        outer = TRUE, line = -37.5)
 
 }
 
