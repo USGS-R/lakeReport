@@ -33,43 +33,61 @@ formatDate <- function(date){
 }
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE, comment=NA}
 wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
 wy_end <- as.POSIXct(paste0(wy, "-09-30"))
 
 pcodes <- read.csv("pcodes.lakes1",header=FALSE,
                    colClasses = "character")[,1]
 
-qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
-                      parameterCd = pcodes, 
-                      startDate = wy_start, 
-                      endDat = wy_end)
+qw_nwis <- tryCatch({readNWISqw(siteNumbers = siteNumber, 
+                               parameterCd = pcodes, 
+                               startDate = wy_start, 
+                               endDat = wy_end)},
+                    error = function(err){
+                      return(NULL)
+                    })
 
-station_nm <- attributes(qw_nwis)$siteInfo$station_nm
-site_no <- attributes(qw_nwis)$siteInfo$site_no
-table_caption <- paste0("WATER-QUALITY DATA, ", 
-                        formatDate(qw_nwis$sample_dt[1]), " TO ",
-                        formatDate(tail(qw_nwis$sample_dt, 1)), 
-                        "\n(Milligrams per liter unless otherwise indicated)")
-last_index <- length(qw_nwis$sample_dt)
-
-qwtable <- makeWqTable(qw_nwis)
+if(!is.null(qw_nwis)){
+  station_nm <- attributes(qw_nwis)$siteInfo$station_nm
+  site_no <- attributes(qw_nwis)$siteInfo$site_no
+  table_caption <- paste0("WATER-QUALITY DATA, ", 
+                          formatDate(qw_nwis$sample_dt[1]), " TO ",
+                          formatDate(tail(qw_nwis$sample_dt, 1)), 
+                          "\n(Milligrams per liter unless otherwise indicated)")
+  last_index <- length(qw_nwis$sample_dt)
+  
+  qwtable <- makeWqTable(qw_nwis)
+  empty_parm <- which(is.na(names(qwtable)))
+  qwtable[,empty_parm] <- NULL
+  
+  cat(getAttr(qw_nwis, 'site_no'), getAttr(qw_nwis, 'station_nm'), "\n")
+  
+  cat("LOCATION.--Lat", getAttr(qw_nwis, 'dec_lat_va'), "long", getAttr(qw_nwis, 'dec_long_va'))
+} else {
+  cat("No data returned for", siteNumber, "from", as.character(wy_start), "to", as.character(wy_end))
+}
 ```
 
+```{r eval=FALSE, echo=FALSE}
 `r getAttr(qw_nwis, 'site_no')` `r getAttr(qw_nwis, 'station_nm')`
 
 LOCATION.--Lat `r getAttr(qw_nwis, 'dec_lat_va')`, long `r getAttr(qw_nwis, 'dec_long_va')` 
+```
 
-`r isWord <- output == "word"`
-```{r eval = !isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+`r isWord <- !is.null(qw_nwis) & output == "word"`
+`r isOther <- !is.null(qw_nwis) & output != "word"`
+
+```{r eval = isOther, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(xtable)
 
 qwtable$sample_dt <- as.character(qwtable$sample_dt)
 
 options(xtable.comment = FALSE)
 qw_xtable <- xtable(qwtable, caption = table_caption, auto=TRUE)
-print.xtable(qw_xtable, NA.string = "--")
+print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
 ```
+
 
 ```{r eval = isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(knitr)
