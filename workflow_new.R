@@ -1,20 +1,3 @@
-# 
-# pcodes <- read.csv("pcodes.lakes1",header=FALSE,
-#                    colClasses = "character")[,1]
-# 
-# sites <- read.csv("water_quality_lakes",header=FALSE,
-#                   colClasses = "character")[,1]
-# 
-# sitesStage <- read.csv("stage_only_lakes",header=FALSE,
-#                        colClasses = "character")[,1]
-# 
-# qwDataNWIS <- readNWISqw(sites, pcodes, "2013-10-01", "2014-09-30")
-# qwDataWQP <- readWQPqw(paste0("USGS-",sites), pcodes, "2013-10-01", "2014-09-30")
-
-#####################################################################################
-
-## generating PDFs workflow
-
 makeReports <- function(siteNumber, wy, reportNames, output){
   for(rn in reportNames){
     renderLakeReport(rn, siteNumber, wy, output)
