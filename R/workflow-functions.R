@@ -11,11 +11,11 @@ renderLakeReport <- function(reportName, siteNumber, wy, output){
   
   output_dir <- getwd()
   filename <- paste(reportName, wy, siteNumber, sep="_")
-  rmd_file <- paste0(reportName, '.Rmd') 
+  rmd_file <- paste0("Report_templates/", reportName, '.Rmd') 
   
   out_file <- render(rmd_file, paste0(output,"_document"), 
                      output_file = paste(filename, output, sep="."),
-                     output_dir = output_dir)
+                     output_dir = output_dir, intermediates_dir = NULL)
   return(out_file)
 }
 
