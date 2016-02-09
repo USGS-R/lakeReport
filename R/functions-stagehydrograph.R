@@ -1,14 +1,5 @@
----
-classoption: landscape
----
+## Functions for making stage hydrograph plots
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
-library(dataRetrieval)
-library(lubridate)
-library(dplyr)
-library(gsplot)
-
-#load functions
 makeStageHydrograph <- function(stage_data){
   if("X_OBSERVER_00065_00003" %in% colnames(stage_data)){
     gage_height_obs <- stage_data %>% 
@@ -27,7 +18,7 @@ makeStageHydrograph <- function(stage_data){
   
   allYears <- seq(year(gage_height_all$dateTime[1]), year(tail(gage_height_all$dateTime,1)))
   allDates <- seq(gage_height_all$dateTime[1], tail(gage_height_all$dateTime,1), by="years")
-    
+  
   stageHydrograph <- gsplot() %>% 
     lines(gage_height_all$dateTime, gage_height_all$gageHeight) %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
@@ -37,30 +28,3 @@ makeStageHydrograph <- function(stage_data){
   
   return(stageHydrograph)
 }
-
-getAttr <- function(data, attr_nm){
-  attributes(data)$siteInfo[[attr_nm]]
-}
-```
-
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
-wy_end <- as.POSIXct(paste0(wy, "-09-30"))
-
-stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
-                           parameterCd = "00065", startDate = "1800-01-01", 
-                           endDate = wy_end)
-
-station_nm <- attributes(stage_data)$siteInfo$station_nm
-last_index <- length(stage_data$dateTime)
-
-stagehydro <- makeStageHydrograph(stage_data)
-```
-
-
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 14}
-stagehydro
-```
-
-
-Stage hydrograph for `r station_nm`, `r paste(year(stage_data$dateTime[c(1, last_index)]), collapse = "-")`
