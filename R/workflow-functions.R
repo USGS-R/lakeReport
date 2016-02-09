@@ -18,3 +18,13 @@ renderLakeReport <- function(reportName, siteNumber, wy, output){
                      output_dir = output_dir)
   return(out_file)
 }
+
+getAttr <- function(data, attr_nm){
+  attributes(data)$siteInfo[[attr_nm]]
+}
+
+formatDate <- function(date){
+  paste0(month(date, label=T, abbr=F), " ", 
+         day(date), ", ",
+         year(date))
+}
