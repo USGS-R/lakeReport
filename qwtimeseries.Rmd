@@ -1,0 +1,83 @@
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+library(dataRetrieval)
+library(dplyr)
+library(gsplot)
+
+#load functions
+# pcode = (00665 OR 00666) for total phosphorus (mg/L)
+# pcode = 32210 for chlorophyll (ug/L)
+# pcode = 00078 for secchi depth (meters)
+# trophic state index ??
+
+filterParmData <- function(data, pcode){
+  data %>% 
+    filter(parm_cd == pcode) %>% 
+    select(sample_dt, result_va, coll_ent_cd)
+}
+
+makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
+  if(!isTrophicIndex){
+    usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
+    observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
+    
+    parm_plot <- gsplot() %>% 
+      points(x = usgs$sample_dt, y = usgs$result_va, 
+             xlab = "", ylab = title, legend.name = "USGS",
+             pch = 18, col = "black") %>% 
+      points(x = observer$sample_dt, y = observer$result_va, 
+             xlab = "", legend.name = "Observer",
+             pch = 1, col = "black") %>%
+      axis(side=2, reverse = axisFlip)
+    if(length(grep("PHOSPHORUS", title)) > 0){ 
+      parm_plot <- parm_plot %>%
+        legend()
+    }
+  } else {
+    parm_plot <- gsplot() %>% 
+      points(x = NA, y = NA, 
+             xlab = "", ylab = title, pch = 20) %>% 
+      axis(side=2, reverse = axisFlip)
+  }
+  return(parm_plot)
+}
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+
+pcodes <- c("00665", "00666", "32210", "00078")
+
+qw_historic <- readNWISqw(siteNumbers = siteNumber, 
+                          parameterCd = pcodes,
+                          startDate = "1800-01-01", 
+                          endDat = wy_end)
+
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.height = 14, fig.width=11} 
+totalP <- filterParmData(qw_historic, "00665") 
+chlorophyll <- filterParmData(qw_historic, "32210")
+secchi <- filterParmData(qw_historic, "00078")
+trophic <- data.frame()
+
+totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
+chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
+secchi_title <- "SECCHI DEPTH, IN METERS"
+trophic_title <- "TROPHIC STATE INDEX"
+
+par(oma = c(1,4,4,0) + 0.1,
+    mar = c(2,2,4,0) + 0.1)
+
+plot_layout <- matrix(1:4, 4, 1)
+layout(plot_layout)
+makeTimeseriesPlot(totalP, totalP_title, 
+                   isTrophicIndex = FALSE, axisFlip = FALSE)
+makeTimeseriesPlot(chlorophyll, chlorophyll_title, 
+                   isTrophicIndex = FALSE, axisFlip = FALSE)
+makeTimeseriesPlot(secchi, secchi_title, 
+                   isTrophicIndex = FALSE, axisFlip = TRUE)
+makeTimeseriesPlot(trophic, trophic_title, 
+                   isTrophicIndex = TRUE, axisFlip = FALSE)
+```
+

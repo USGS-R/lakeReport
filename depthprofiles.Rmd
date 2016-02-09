@@ -1,0 +1,213 @@
+---
+classoption: landscape
+---
+```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+library(dataRetrieval)
+library(dplyr)
+library(lubridate)
+library(gsplot)
+
+#load functions
+
+makeLakeDepthProfiles <- function(qw_nwis){
+  # pcode = 00098 for sampling depth (meters)
+  # pcode = 00300 for dissolved oxygen (mg/L)
+  # pcode = 00010 for water temperature (deg C)
+  # pcode = 00400 for pH
+  # pcode = 00095 for specific conductance (uS/cm at 25 deg C)
+
+  # seperating data
+  unique_depth_samples <- qw_nwis %>% 
+    filter(parm_cd == "00098") %>% 
+    group_by(sample_dt) %>% 
+    count(sample_dt) %>% 
+    filter(n > 1)
+  
+  depth <- qw_nwis %>% 
+    filter(parm_cd == "00098") %>%
+    filter(sample_dt %in% unique_depth_samples$sample_dt) %>% 
+    select(sample_dt, sample_tm, result_va) %>% 
+    rename(depth = result_va)
+  
+  DO <- getQWData(qw_nwis, depth, "00300")
+  h2otemp <- getQWData(qw_nwis, depth, "00010")
+  PH <- getQWData(qw_nwis, depth, "00400")
+  specifcond <- getQWData(qw_nwis, depth, "00095")
+  
+  # figuring out the number of plots that will be needed
+  dates_uniq <- unique_depth_samples$sample_dt
+  
+  return(list(DO = DO, h2otemp = h2otemp, 
+              PH = PH, specifcond = specifcond, 
+              dates_uniq = dates_uniq))
+}
+
+getQWData <- function(data, depth, pcode){
+  pcode_data <- data %>% 
+    filter(parm_cd == pcode) %>% 
+    select(sample_dt, sample_tm, result_va)
+  
+  plot_data <- left_join(depth, pcode_data)
+  return(plot_data)
+}
+
+filterByDate <- function(df, filter_date){
+  df <- df %>% filter(sample_dt == filter_date) %>% 
+    arrange(depth)
+  return(list(x=df[['result_va']], y=df[['depth']]))
+}
+
+depthProfilePlot <- function(side1, side3, filter_date, top,
+                             title_above, title_below, left){
+  side1_list <- filterByDate(side1, filter_date)
+  side3_list <- filterByDate(side3, filter_date)
+  
+  title_main <- ifelse(top, as.character(filter_date), "")
+  
+  smartTicks <- function(vals, yaxis, top){
+    vals <- na.omit(vals)
+    low_lim <- min(floor(vals/5)*5)
+    up_lim <- max(ceiling(vals/5)*5)
+    minor_x <- ifelse(top, 4, 0)
+    by_step <- ifelse(yaxis, 2, 5)
+    at_vals <- seq(low_lim, up_lim, by=by_step)
+    return(list(nminor=minor_x, at_vals=at_vals))
+  }
+  
+  all_y <- c(side1_list$y, side3_list$y)
+  yticks <- smartTicks(all_y, yaxis=TRUE, top)
+  xticks_1 <- smartTicks(side1_list$x, yaxis=FALSE, top)
+  xticks_3 <- smartTicks(side3_list$x, yaxis=FALSE, top)
+  
+  gs <- gsplot() %>% 
+    lines(side1_list$x, side1_list$y, lty=3) %>% 
+    lines(side3_list$x, side3_list$y, side=3) %>% 
+    axis(side=2, reverse=TRUE, n.minor=1, at=yticks$at_vals) %>% 
+    axis(side=4, reverse=TRUE, labels=FALSE, n.minor=1, at=yticks$at_vals) %>% 
+    axis(side=1, at=xticks_1$at_vals, n.minor=xticks_1$nminor) %>% 
+    axis(side=3, at=xticks_3$at_vals, n.minor=xticks_3$nminor) %>% 
+    title(main = title_main, line = 4)
+  
+  return(gs)
+}
+
+getAttr <- function(data, attr_nm){
+  attributes(data)$siteInfo[[attr_nm]]
+}
+
+formatDate <- function(date){
+  paste0(month(date, label=T, abbr=F), " ", 
+         day(date), ", ",
+         year(date))
+}
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
+wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+
+pcodes <- c("00098", "00300", "00010", "00400", "00095")
+
+qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
+                      parameterCd = pcodes, 
+                      startDate = wy_start, 
+                      endDat = wy_end)
+
+station_nm <- attributes(qw_nwis)$siteInfo$station_nm
+site_no <- attributes(qw_nwis)$siteInfo$site_no
+table_caption <- paste0("LAKE-DEPTH PROFILES, ", 
+                        formatDate(qw_nwis$sample_dt[1]), " TO ",
+                        formatDate(tail(qw_nwis$sample_dt, 1)))
+last_index <- length(qw_nwis$sample_dt)
+
+prof_data <- makeLakeDepthProfiles(qw_nwis)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
+#grab data from big list
+dates_uniq <- prof_data$dates_uniq
+DO <- prof_data$DO
+h2otemp <- prof_data$h2otemp
+PH <- prof_data$PH
+specifcond <- prof_data$specifcond
+
+#setup plot titles
+DO_title <- "DISSOLVED OXYGEN (D.O.) IN MILLIGRAMS PER LITER"
+h2otemp_title <- "WATER TEMPERATURE (W.T.) IN DEGREES CELCIUS"
+PH_title <- "PH IN STANDARD UNITS"
+specifcond_title <- "SPECIFIC CONDUCTANCE (S.C.) IN MICROSIEMENS PER CENTIMETER AT 25 DEGREES CELCIUS"
+
+num_2x4_plots <- floor(length(dates_uniq)/4)
+num_extra_dates <- length(dates_uniq)%%4
+
+#set plot options for margins
+par(oma = c(5,4,4,0) + 0.1,
+    mar = c(1,1,5,1) + 0.1)
+
+#2x4 plots
+d <- 1
+for(p in seq(num_2x4_plots)){
+  if(p > 1){cat("\n\\newpage\n")}
+  dts <- dates_uniq[d:(p*4)]
+
+  plot_setup <- matrix(1:8, 2, 4)
+  layout(plot_setup)
+  for(t in seq_along(dts)){
+    left_logic <- t == 1
+    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
+                           DO_title, h2otemp_title, left_logic))
+    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
+                           PH_title, specifcond_title, left_logic))
+  }
+  
+  #add titles around the plot
+  title(ylab = "DEPTH, IN METERS",
+        outer = TRUE, line = 2)
+  title(xlab = specifcond_title,
+        outer = TRUE, line = 1)
+  title(xlab = PH_title,
+        outer = TRUE, line = -17)
+  title(xlab = h2otemp_title,
+        outer = TRUE, line = -19.5)
+  title(xlab = DO_title,
+        outer = TRUE, line = -37.5)
+
+  d <- (p*4)+1
+}
+
+
+#extras 
+dts <- tail(dates_uniq, num_extra_dates)
+if(length(dts) > 0){
+  cat("\n\\newpage\n")
+  
+  plot_setup <- matrix(1:8, 2, 4)
+  layout(plot_setup)
+  for(t in seq_along(dts)){
+    left_logic <- t == 1
+    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
+                           DO_title, h2otemp_title, left_logic))
+    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE,
+                           PH_title, specifcond_title, left_logic))
+  }
+  
+  #add titles around the plot
+  title(ylab = "DEPTH, IN METERS",
+        outer = TRUE, line = 2)
+  title(xlab = specifcond_title,
+        outer = TRUE, line = 1)
+  title(xlab = PH_title,
+        outer = TRUE, line = -17)
+  title(xlab = h2otemp_title,
+        outer = TRUE, line = -19.5)
+  title(xlab = DO_title,
+        outer = TRUE, line = -37.5)
+
+}
+
+## still working on lake-depth profiles
+##left off -- need to eliminate no data graphs
+##tick marks and formatting for graphs
+##have same scale on matching axes (all side3 from 0-20, all side1 from 0-30) 
+##y limits are not being used correctly on graph (only goes to 8, but should go to 10)
+```

@@ -1,0 +1,83 @@
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
+library(dataRetrieval)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+
+#load functions
+makeGageHeightTable <- function(stage_data, wy_start){
+  wy_months <- month.abb[c(10,11,12, 1:9)]
+  
+  gh_table <- stage_data %>% 
+    filter(dateTime >= wy_start) %>% 
+    select(dateTime, ends_with("_00065_00003"), -starts_with("X_OBSERVER")) %>% 
+    mutate(Month = factor(month(dateTime, label = TRUE, abbr = TRUE), 
+                          levels = wy_months, ordered = TRUE)) 
+  
+  gh_table_months <- gh_table %>% 
+    mutate(Day = format(dateTime, "%d")) %>%
+    select(Day, Month, gageHeight = ends_with("_00065_00003")) %>%
+    spread(Month, gageHeight)
+  
+  stats_mean <- gh_table_months %>% 
+    summarize_each(funs = funs(mean(., na.rm = TRUE)), vars = -1) %>% 
+    mutate(Day = "MEAN") %>% select(Day, everything())
+  stats_max <- gh_table_months %>% 
+    summarize_each(funs = funs(max(., na.rm = TRUE)), vars = -1) %>% 
+    mutate(Day = "MAX") %>% select(Day, everything())
+  stats_min <- gh_table_months %>% 
+    summarize_each(funs = funs(min(., na.rm = TRUE)), vars = -1) %>% 
+    mutate(Day = "MIN") %>% select(Day, everything())
+  
+  gh_table_final <- gh_table_months %>% 
+    bind_rows(stats_mean, stats_max, stats_min)
+  
+  return(gh_table_final)
+}
+
+getAttr <- function(data, attr_nm){
+  attributes(data)$siteInfo[[attr_nm]]
+}
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
+wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+
+stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
+                           parameterCd = "00065", startDate = "1800-01-01", 
+                           endDate = wy_end)
+
+station_nm <- attributes(stage_data)$siteInfo$station_nm
+site_no <- attributes(stage_data)$siteInfo$site_no
+last_index <- length(stage_data$dateTime)
+
+ghtable <- makeGageHeightTable(stage_data, wy_start) 
+```
+
+## `r getAttr(stage_data, 'site_no')` `r getAttr(stage_data, 'station_nm')`
+
+### LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
+
+*****
+
+GAGE HEIGHT, FEET
+
+`r paste("WATER YEAR OCTOBER", wy-1, "TO SEPTEMBER", wy)`
+
+DAILY MEAN VALUES
+
+`r isWord <- output == "word"`
+```{r eval=!isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(xtable)
+options(xtable.comment = FALSE)
+
+gh_xtable <- xtable(ghtable, auto=TRUE)
+print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
+```
+
+```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+library(knitr)
+kable(ghtable)
+```
