@@ -20,7 +20,7 @@ pcodes <- c("00098", "00300", "00010", "00400", "00095")
 qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
                       parameterCd = pcodes, 
                       startDate = wy_start, 
-                      endDat = wy_end)
+                      endDate = wy_end)
 
 station_nm <- attributes(qw_nwis)$siteInfo$station_nm
 site_no <- attributes(qw_nwis)$siteInfo$site_no
