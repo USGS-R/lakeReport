@@ -26,13 +26,6 @@ qw_nwis <- tryCatch({readNWISqw(siteNumbers = siteNumber,
                     })
 
 if(!is.null(qw_nwis)){
-  station_nm <- attributes(qw_nwis)$siteInfo$station_nm
-  site_no <- attributes(qw_nwis)$siteInfo$site_no
-  table_caption <- paste0("WATER-QUALITY DATA, ", 
-                          formatDate(qw_nwis$sample_dt[1]), " TO ",
-                          formatDate(tail(qw_nwis$sample_dt, 1)), 
-                          "\n(Milligrams per liter unless otherwise indicated)")
-  last_index <- length(qw_nwis$sample_dt)
   
   qwtable <- makeWqTable(qw_nwis)
   empty_parm <- which(is.na(names(qwtable)))
