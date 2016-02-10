@@ -26,11 +26,7 @@ qw_nwis <- tryCatch({readNWISqw(siteNumbers = siteNumber,
                     })
 
 if(!is.null(qw_nwis)){
-  
   qwtable <- makeWqTable(qw_nwis)
-  empty_parm <- which(is.na(names(qwtable)))
-  qwtable[,empty_parm] <- NULL
-  
 } else {
   cat("No data returned for", siteNumber, "from", as.character(wy_start), "to", as.character(wy_end))
 }
