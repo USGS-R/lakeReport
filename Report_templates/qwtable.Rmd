@@ -38,18 +38,9 @@ if(!is.null(qw_nwis)){
   empty_parm <- which(is.na(names(qwtable)))
   qwtable[,empty_parm] <- NULL
   
-  cat(getAttr(qw_nwis, 'site_no'), getAttr(qw_nwis, 'station_nm'), "\n")
-  
-  cat("LOCATION.--Lat", getAttr(qw_nwis, 'dec_lat_va'), "long", getAttr(qw_nwis, 'dec_long_va'))
 } else {
   cat("No data returned for", siteNumber, "from", as.character(wy_start), "to", as.character(wy_end))
 }
-```
-
-```{r eval=FALSE, echo=FALSE}
-`r getAttr(qw_nwis, 'site_no')` `r getAttr(qw_nwis, 'station_nm')`
-
-LOCATION.--Lat `r getAttr(qw_nwis, 'dec_lat_va')`, long `r getAttr(qw_nwis, 'dec_long_va')` 
 ```
 
 `r isWord <- !is.null(qw_nwis) & output == "word"`
@@ -61,12 +52,12 @@ library(xtable)
 qwtable$sample_dt <- as.character(qwtable$sample_dt)
 
 options(xtable.comment = FALSE)
-qw_xtable <- xtable(qwtable, caption = table_caption, auto=TRUE)
+qw_xtable <- xtable(qwtable, auto=TRUE)
 print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
 ```
 
 
 ```{r eval = isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(knitr)
-kable(qwtable, caption = table_caption)
+kable(qwtable)
 ```

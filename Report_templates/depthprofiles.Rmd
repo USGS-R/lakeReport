@@ -22,13 +22,6 @@ qw_nwis <- readNWISqw(siteNumbers = siteNumber,
                       startDate = wy_start, 
                       endDate = wy_end)
 
-station_nm <- attributes(qw_nwis)$siteInfo$station_nm
-site_no <- attributes(qw_nwis)$siteInfo$site_no
-table_caption <- paste0("LAKE-DEPTH PROFILES, ", 
-                        formatDate(qw_nwis$sample_dt[1]), " TO ",
-                        formatDate(tail(qw_nwis$sample_dt, 1)))
-last_index <- length(qw_nwis$sample_dt)
-
 prof_data <- makeLakeDepthProfiles(qw_nwis)
 ```
 

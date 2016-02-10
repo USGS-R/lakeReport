@@ -29,6 +29,3 @@ stagehydrograph <- makeStageHydrograph(stage_data)
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 14}
 stagehydrograph
 ```
-
-
-Stage hydrograph for `r station_nm`, `r paste(year(stage_data$dateTime[c(1, last_index)]), collapse = "-")`
