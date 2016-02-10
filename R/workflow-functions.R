@@ -9,7 +9,7 @@ makeReports <- function(siteNumber, wy, reportNames, output){
 renderLakeReport <- function(reportName, siteNumber, wy, output){
   library(rmarkdown)
   
-  output_dir <- getwd()
+  output_dir <- file.path(getwd(), wy)
   filename <- paste(reportName, wy, siteNumber, sep="_")
   rmd_file <- paste0("Report_templates/", reportName, '.Rmd') 
   
