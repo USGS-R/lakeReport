@@ -1,17 +1,17 @@
 # top-level functions 
 
-makeReports <- function(siteNumber, wy, reportNames, output){
-  for(rn in reportNames){
+makeReports <- function(siteNumber, wy, plotNames, output){
+  for(rn in plotNames){
     renderLakeReport(rn, siteNumber, wy, output)
   }
 }
 
-renderLakeReport <- function(reportName, siteNumber, wy, output){
+renderLakeReport <- function(plotName, siteNumber, wy, output){
   library(rmarkdown)
   
   output_dir <- file.path(getwd(), wy)
-  filename <- paste(reportName, wy, siteNumber, sep="_")
-  rmd_file <- paste0("Report_templates/", reportName, '.Rmd') 
+  filename <- paste(plotName, wy, siteNumber, sep="_")
+  rmd_file <- paste0("Report_templates/", plotName, '.Rmd') 
   
   out_file <- render(rmd_file, paste0(output,"_document"), 
                      output_file = paste(filename, output, sep="."),

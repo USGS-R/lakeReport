@@ -5,21 +5,21 @@
 wy <- 2014
 
 siteNumber <- '05390500'
-reportNames <- c('ghtable', 'stagehydrograph')
-makeReports(siteNumber, wy, reportNames, 'pdf')
+plotNames <- c('ghtable', 'stagehydrograph')
+makeReports(siteNumber, wy, plotNames, 'pdf')
 
 siteNumber <- '455638089034501'
-reportNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
-makeReports(siteNumber, wy, reportNames, 'pdf')
+plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
+makeReports(siteNumber, wy, plotNames, 'pdf')
 
 # Rendering as word docs (tables don't have nice formatting)
 # Same as above, but output is word documents
 wy <- 2014
 
 siteNumber <- '05390500'
-reportNames <- c('ghtable', 'stagehydrograph')
-makeReports(siteNumber, wy, reportNames, 'word')
+plotNames <- c('ghtable', 'stagehydrograph')
+makeReports(siteNumber, wy, plotNames, 'word')
 
 siteNumber <- '455638089034501'
-reportNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
-makeReports(siteNumber, wy, reportNames, 'word')
+plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
+makeReports(siteNumber, wy, plotNames, 'word')
