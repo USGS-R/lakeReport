@@ -1,3 +1,6 @@
+---
+classoption: landscape
+---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 library(dataRetrieval)
@@ -29,6 +32,11 @@ print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
 ```
 
 ```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
-library(knitr)
-kable(ghtable)
+library(pander)
+panderOptions('missing', '--')
+panderOptions('digits', 4)
+panderOptions('keep.trailing.zeros', TRUE)
+panderOptions('table.continues', NULL)
+panderOptions('table.split.table', Inf)
+pander(ghtable)
 ```

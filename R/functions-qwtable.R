@@ -11,8 +11,10 @@ makeWqTable <- function(qw_nwis){
     select(-sample_tm)
   
   #reorder columns
-  col_order <- c("sample_dt", "00078", "00098", "00010", "00095", "00400", "00300", 
-                 "32210", "00665", "00666", "00671", "00600", "00608", "00623", "00625", "00631")
+  col_order <- c("sample_dt", "00078", "00098", "00010", "00095", 
+                 "00400", "00300", "32210", "00665")
+  # append rest of columns not explicitly defined in col_order
+  col_order <- c(col_order, names(qw_table)[which(!names(qw_table) %in% col_order)])
   qw_table <- qw_table[, match(col_order, names(qw_table))]
   
   #rename columns based on parameter name, not code
