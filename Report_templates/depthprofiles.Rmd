@@ -15,9 +15,11 @@ source("../R/functions-depthprofiles.R")
 wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
 wy_end <- as.POSIXct(paste0(wy, "-09-30"))
 
-plotRanges <- read.csv("../data/depthProfileRanges.csv", 
-                       colClass=c(rep("character", 2), rep("numeric", 8))) %>% 
+# pull in ranges from csv file & filter for just this site
+column_classes <- c(rep("character", 2), rep("numeric", 8))
+plotRanges <- read.csv("../data/depthProfileRanges.csv", colClass=column_classes) %>% 
   filter(site_no == siteNumber)
+
 pcodes <- c("00098", "00300", "00010", "00400", "00095")
 
 qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
@@ -25,7 +27,7 @@ qw_nwis <- readNWISqw(siteNumbers = siteNumber,
                       startDate = wy_start, 
                       endDate = wy_end)
 
-prof_data <- makeLakeDepthProfiles(qw_nwis)
+prof_data <- filterLakeDepthProfileData(qw_nwis)
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
@@ -42,10 +44,11 @@ h2otemp_title <- "WATER TEMPERATURE (W.T.) IN DEGREES CELCIUS"
 PH_title <- "PH IN STANDARD UNITS"
 specifcond_title <- "SPECIFIC CONDUCTANCE (S.C.) IN MICROSIEMENS PER CENTIMETER AT 25 DEGREES CELCIUS"
 
+#figuring out how many 2x4 sets there are, and then how many extra
 num_2x4_plots <- floor(length(dates_uniq)/4)
 num_extra_dates <- length(dates_uniq)%%4
 
-#set plot options for margins
+#set plot options for margins (in order to fit text)
 par(oma = c(5,4,4,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
@@ -81,7 +84,7 @@ for(p in seq(num_2x4_plots)){
 }
 
 
-#extras 
+#extra plots that don't make a full 2x4 set 
 dts <- tail(dates_uniq, num_extra_dates)
 if(length(dts) > 0){
   cat("\n\\newpage\n")

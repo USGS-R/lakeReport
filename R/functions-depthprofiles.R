@@ -6,15 +6,16 @@
 # pcode = 00400 for pH
 # pcode = 00095 for specific conductance (uS/cm at 25 deg C)
 
-makeLakeDepthProfiles <- function(qw_nwis){
+filterLakeDepthProfileData <- function(qw_nwis){
   
-  # seperating data
+  # more than one depth measurement was taken on a particular day
   unique_depth_samples <- qw_nwis %>% 
     filter(parm_cd == "00098") %>% 
     group_by(sample_dt) %>% 
     count(sample_dt) %>% 
-    filter(n > 1)
+    filter(n > 1) 
   
+  # filter based on criteria from above
   depth <- qw_nwis %>% 
     filter(parm_cd == "00098") %>%
     filter(sample_dt %in% unique_depth_samples$sample_dt) %>% 
