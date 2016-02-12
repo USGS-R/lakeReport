@@ -23,3 +23,18 @@ makeReports(siteNumber, wy, plotNames, 'word')
 siteNumber <- '455638089034501'
 plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
 makeReports(siteNumber, wy, plotNames, 'word')
+
+# If stagehydrograph data is coming from a file and not 
+# dataRetrieval, you will need to add extra arguments
+# 
+# filePath = '[FILEPATH W/ FILENAME & FILE EXTENSION]'
+# dateTime = '[COLUMN NAME FOR THE DATE/DATE TIME]'
+# gageHeight = '[COLUMN NAME FOR THE STAGE DATA]'
+
+wy <- 2014
+siteNumber <- '05390500'
+plotNames <- 'stagehydrograph'
+makeReports(siteNumber, wy, plotNames, 'pdf', 
+            filePath = 'myfilepath',
+            dateTime = 'sample_dt',
+            gageHeight = 'result_va')

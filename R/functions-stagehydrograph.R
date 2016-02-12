@@ -1,6 +1,6 @@
 ## Functions for making stage hydrograph plots
 
-makeStageHydrograph <- function(stage_data){
+makeStageHydrograph_dataRetrieval <- function(stage_data){
   if("X_OBSERVER_00065_00003" %in% colnames(stage_data)){
     gage_height_obs <- stage_data %>% 
       select(dateTime, X_OBSERVER_00065_00003) %>% 
@@ -21,6 +21,25 @@ makeStageHydrograph <- function(stage_data){
   
   stageHydrograph <- gsplot() %>% 
     lines(gage_height_all$dateTime, gage_height_all$gageHeight) %>% 
+    axis(side=1, at=allDates, labels=allYears) %>% 
+    axis(side=3, at=allDates, labels=FALSE) %>%
+    axis(side=2, n.minor=4) %>%
+    title(ylab = "GAGE HEIGHT, IN FEET")
+  
+  return(stageHydrograph)
+}
+
+makeStageHydrograph_file <- function(stage_data, datetime_colname, gageheight_colname){
+  
+  gage_height <- stage_data %>% 
+    select(dateTime = matches(datetime_colname), gageHeight = matches(gageheight_colname)) %>%
+    na.omit()
+  
+  allYears <- seq(year(gage_height$dateTime[1]), year(tail(gage_height$dateTime,1)))
+  allDates <- seq(gage_height$dateTime[1], tail(gage_height$dateTime,1), by="years")
+  
+  stageHydrograph <- gsplot() %>% 
+    lines(gage_height$dateTime, gage_height$gageHeight) %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
     axis(side=2, n.minor=4) %>%

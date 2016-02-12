@@ -1,12 +1,12 @@
 # top-level functions 
 
-makeReports <- function(siteNumber, wy, plotNames, output){
+makeReports <- function(siteNumber, wy, plotNames, output, ...){
   for(rn in plotNames){
-    renderLakeReport(rn, siteNumber, wy, output)
+    renderLakeReport(rn, siteNumber, wy, output, ...)
   }
 }
 
-renderLakeReport <- function(plotName, siteNumber, wy, output){
+renderLakeReport <- function(plotName, siteNumber, wy, output, ...){
   library(rmarkdown)
   
   output_dir <- file.path(getwd(), wy)
