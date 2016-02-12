@@ -15,6 +15,9 @@ source("../R/functions-depthprofiles.R")
 wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
 wy_end <- as.POSIXct(paste0(wy, "-09-30"))
 
+plotRanges <- read.csv("../data/depthProfileRanges.csv", 
+                       colClass=c(rep("character", 2), rep("numeric", 8))) %>% 
+  filter(site_no == siteNumber)
 pcodes <- c("00098", "00300", "00010", "00400", "00095")
 
 qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
@@ -55,11 +58,11 @@ for(p in seq(num_2x4_plots)){
   plot_setup <- matrix(1:8, 2, 4)
   layout(plot_setup)
   for(t in seq_along(dts)){
-    left_logic <- t == 1
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
-                           DO_title, h2otemp_title, left_logic))
+    left_logic <- t == 1 #is it the farthest left plot
+    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE, 
+                           left=left_logic, xranges=plotRanges))
     print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
-                           PH_title, specifcond_title, left_logic))
+                           left=left_logic, xranges=plotRanges))
   }
   
   #add titles around the plot
@@ -68,7 +71,7 @@ for(p in seq(num_2x4_plots)){
   title(xlab = specifcond_title,
         outer = TRUE, line = 1)
   title(xlab = PH_title,
-        outer = TRUE, line = -17)
+        outer = TRUE, line = -17.5)
   title(xlab = h2otemp_title,
         outer = TRUE, line = -19.5)
   title(xlab = DO_title,
@@ -86,11 +89,11 @@ if(length(dts) > 0){
   plot_setup <- matrix(1:8, 2, 4)
   layout(plot_setup)
   for(t in seq_along(dts)){
-    left_logic <- t == 1
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
-                           DO_title, h2otemp_title, left_logic))
-    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE,
-                           PH_title, specifcond_title, left_logic))
+    left_logic <- t == 1 #is it the farthest left plot
+    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE, 
+                           left=left_logic, xranges=plotRanges))
+    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
+                           left=left_logic, xranges=plotRanges))
   }
   
   #add titles around the plot
@@ -99,7 +102,7 @@ if(length(dts) > 0){
   title(xlab = specifcond_title,
         outer = TRUE, line = 1)
   title(xlab = PH_title,
-        outer = TRUE, line = -17)
+        outer = TRUE, line = -17.5)
   title(xlab = h2otemp_title,
         outer = TRUE, line = -19.5)
   title(xlab = DO_title,
