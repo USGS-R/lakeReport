@@ -20,7 +20,7 @@ qw_historic <- readNWISqw(siteNumbers = siteNumber,
 totalP <- filterParmData(qw_historic, "00665") 
 chlorophyll <- filterParmData(qw_historic, "32210")
 secchi <- filterParmData(qw_historic, "00078")
-trophic <- data.frame()
+trophic <- calcTrophicIndex(totalP, secchi, chlorophyll)
 
 totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
 chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
