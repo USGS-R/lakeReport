@@ -38,3 +38,27 @@ makeReports(siteNumber, wy, plotNames, 'pdf',
             filePath = 'myfilepath',
             dateTime = 'sample_dt',
             gageHeight = 'result_va')
+
+
+### Rendering for multiple sites and plot types at a time
+
+wy <- 2014
+siteNumber <- c('05390500', '05404500')
+plotNames <- c('ghtable', 'stagehydrograph')
+makeReports(siteNumber, wy, plotNames, 'word')
+
+
+### Using the 'auto' feature for siteNumber and plotNames
+### Two possibilities:
+
+# 1. Generate all possible plot types for specified sites 
+wy <- 2014
+siteNumber <- c('05390500', '424840088241600')
+plotNames <- 'auto'
+makeReports(siteNumber, wy, plotNames, 'word')
+
+# 2. Generate all possible plot types for all possible sites 
+wy <- 2014
+siteNumber <- 'auto'
+plotNames <- 'auto'
+makeReports(siteNumber, wy, plotNames, 'word')
