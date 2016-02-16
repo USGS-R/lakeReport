@@ -5,7 +5,8 @@ makeGageHeightTable <- function(stage_data, wy_start){
   
   gh_table <- stage_data %>% 
     filter(dateTime >= wy_start) %>% 
-    select(dateTime, ends_with("_00065_00003"), -starts_with("X_OBSERVER")) %>% 
+    select(dateTime, ends_with("_00065_00003"), 
+           -starts_with("X_OBSERVER"), -starts_with('X_TAILWATER')) %>% 
     mutate(Month = factor(month(dateTime, label = TRUE, abbr = TRUE), 
                           levels = wy_months, ordered = TRUE)) 
   
