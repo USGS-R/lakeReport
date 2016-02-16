@@ -53,36 +53,40 @@ par(oma = c(5,4,4,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
 #2x4 plots
-d <- 1
-for(p in seq(num_2x4_plots)){
-  if(p > 1){cat("\n\\newpage\n")}
-  dts <- dates_uniq[d:(p*4)]
+if(num_2x4_plots != 0){
 
-  plot_setup <- matrix(1:8, 2, 4)
-  layout(plot_setup)
-  for(t in seq_along(dts)){
-    left_logic <- t == 1 #is it the farthest left plot
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE, 
-                           left=left_logic, xranges=plotRanges))
-    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
-                           left=left_logic, xranges=plotRanges))
-  }
+  d <- 1
+  for(p in seq(num_2x4_plots)){
+    if(p > 1){cat("\n\\newpage\n")}
+    dts <- dates_uniq[d:(p*4)]
   
-  #add titles around the plot
-  title(ylab = "DEPTH, IN METERS",
-        outer = TRUE, line = 2)
-  title(xlab = specifcond_title,
-        outer = TRUE, line = 1)
-  title(xlab = PH_title,
-        outer = TRUE, line = -17.5)
-  title(xlab = h2otemp_title,
-        outer = TRUE, line = -19.5)
-  title(xlab = DO_title,
-        outer = TRUE, line = -37.5)
-
-  d <- (p*4)+1
-}
-
+    plot_setup <- matrix(1:8, 2, 4)
+    layout(plot_setup)
+    for(t in seq_along(dts)){
+      left_logic <- t == 1 #is it the farthest left plot
+      print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+                             filter_date = dts[t], top = TRUE, 
+                             left = left_logic, xranges = plotRanges))
+      print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+                             filter_date = dts[t], top = FALSE, 
+                             left = left_logic, xranges = plotRanges))
+    }
+    
+    #add titles around the plot
+    title(ylab = "DEPTH, IN METERS",
+          outer = TRUE, line = 2)
+    title(xlab = specifcond_title,
+          outer = TRUE, line = 1)
+    title(xlab = PH_title,
+          outer = TRUE, line = -17.5)
+    title(xlab = h2otemp_title,
+          outer = TRUE, line = -19.5)
+    title(xlab = DO_title,
+          outer = TRUE, line = -37.5)
+  
+    d <- (p*4)+1
+  }
+} 
 
 #extra plots that don't make a full 2x4 set 
 dts <- tail(dates_uniq, num_extra_dates)
@@ -93,10 +97,12 @@ if(length(dts) > 0){
   layout(plot_setup)
   for(t in seq_along(dts)){
     left_logic <- t == 1 #is it the farthest left plot
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE, 
+    print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+                           filter_date = dts[t], top = TRUE, 
                            left=left_logic, xranges=plotRanges))
-    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
-                           left=left_logic, xranges=plotRanges))
+    print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+                           filter_date = dts[t], top = FALSE, 
+                           left = left_logic, xranges = plotRanges))
   }
   
   #add titles around the plot

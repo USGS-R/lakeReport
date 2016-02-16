@@ -84,6 +84,7 @@ depthProfilePlot <- function(side1, side3, filter_date,
     side3 <- seq(from=xranges$do_low, to=xranges$do_high, by=10)
     xn.minor <- 4
     plottext <- c("W.T.", "D.O.") # legend label
+    mainTitle <- filter_date
   } else{
     sc_sequence_categ <- cut(xranges$sc_high - xranges$sc_low,
                              breaks=c(0, 50, 200, 500, 900, Inf),
@@ -94,6 +95,7 @@ depthProfilePlot <- function(side1, side3, filter_date,
     side3 <- seq(from=xranges$ph_low, to=xranges$ph_high, by=1)
     xn.minor <- 0
     plottext <- c("S.C.", "pH") # legend label
+    mainTitle <- ""
   }
   
   depthplot <- gsplot() %>% 
@@ -115,7 +117,10 @@ depthProfilePlot <- function(side1, side3, filter_date,
     
     # formatting x axes
     axis(side=1, at=side1, n.minor=xn.minor) %>% 
-    axis(side=3, at=side3, n.minor=xn.minor) 
+    axis(side=3, at=side3, n.minor=xn.minor) %>% 
+    
+    # add dates title only to top plots
+    title(main = mainTitle, line = 4)
   
   # add legend to only plots on far left
   if(left){
