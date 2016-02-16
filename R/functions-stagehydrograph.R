@@ -16,8 +16,8 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
     filter(!is.na(gageHeight)) 
   gage_height_all <- rbind(gage_height_obs, gage_height_cont)
   
-  allYears <- seq(year(gage_height_all$dateTime[1]), year(tail(gage_height_all$dateTime,1)))
   allDates <- seq(gage_height_all$dateTime[1], tail(gage_height_all$dateTime,1), by="years")
+  allYears <- year(allDates)
   
   stageHydrograph <- gsplot() %>% 
     lines(gage_height_all$dateTime, gage_height_all$gageHeight) %>% 
