@@ -3,7 +3,69 @@
 
 Scripts and report generator
 
+**Updated workflow:**
+1. Open RStudio & the `lakeReport` project
+2. Source the `workflow-functions` script
+3. Specify inputs to `makeReports` (see below)
+4. Run `makeReports`
 
+**Required Inputs for `makeReports` function**
+
+| Input | Type | Description |
+| --- | --- | --- |
+| `siteNumber` | string, value or vector | the USGS station number OR `auto` |
+| `wy` | numeric, value | water year |
+| `plotNames` | character, value or vector | options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto` |
+| `output` | string, value | the format you would like the file saved as [options: `pdf` or `word`] |
+
+**Optional Inputs for `makeReports` function with `stagehydrograph`**
+
+| Input | Type | Description |
+| --- | --- | --- |
+| `filepath` | string, value | indicates where your csv is located |
+| `dateTime` | string, value | indicates the column name in your csv where dates are stored |
+| `gageHeight` | string, value | indicates the column name in your csv where gage heights are stored |
+
+**Examples**
+``` r
+# single site, single report
+wy <- 2014
+siteNumber <- '05390500'
+plotNames <- 'ghtable'
+output <- 'pdf'
+makeReports(siteNumber, wy, plotNames, output)
+
+# single site, multiple reports as word
+wy <- 2014
+siteNumber <- '455638089034501'
+plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
+output <- 'word'
+makeReports(siteNumber, wy, plotNames, output)
+
+# get all plotNames from `plotNames_by_site.csv` for a single site
+wy <- 2014
+siteNumber <- '05390500'
+plotNames <- 'auto'
+output <- 'word'
+makeReports(siteNumber, wy, plotNames, output)
+
+# run all possible site and plotName combinations from `plotNames_by_site.csv`  
+# currently makes all 89 combinations in ~ 6 minutes
+wy <- 2014
+siteNumber <- 'auto'
+plotNames <- 'auto'
+output <- 'word'
+makeReports(siteNumber, wy, plotNames, output)
+
+# use data from a file for stagehydrograph (not using dataRetrieval)
+wy <- 2014
+siteNumber <- '05390500'
+plotNames <- 'stagehydrograph'
+makeReports(siteNumber, wy, plotNames, 'pdf', 
+            filePath = 'myfilepath',
+            dateTime = 'sample_dt',
+            gageHeight = 'result_va')
+```
 
 
 ##Disclaimer
