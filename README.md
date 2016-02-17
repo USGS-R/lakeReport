@@ -1,9 +1,11 @@
 `Lake Report`
 =============
 
-Scripts and report generator
+Scripts and report generator for Wisconsin Lake Reports.
 
-**Updated workflow:**
+Workflow
+--------------------------
+
 1. Open RStudio & the `lakeReport` project
 2. Source the `workflow-functions` script
 3. Specify inputs to `makeReports` (see below)
@@ -26,7 +28,10 @@ Scripts and report generator
 | `dateTime` | string, value | indicates the column name in your csv where dates are stored |
 | `gageHeight` | string, value | indicates the column name in your csv where gage heights are stored |
 
-**Examples**
+
+Workflow Examples
+--------------------------
+
 ``` r
 # single site, single report
 wy <- 2014
