@@ -7,9 +7,10 @@ Workflow
 --------------------------
 
 1. Open RStudio & the `lakeReport` project
-2. Source the `workflow-functions` script
+2. Source the `workflow-functions.R` script
 3. Specify inputs to `makeReports` (see below)
 4. Run `makeReports`
+
 
 **Required Inputs for `makeReports` function**
 
@@ -19,6 +20,7 @@ Workflow
 | `wy` | numeric, value | water year |
 | `plotNames` | character, value or vector | options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto` |
 | `output` | string, value | the format you would like the file saved as [options: `pdf` or `word`] |
+
 
 **Optional Inputs for `makeReports` function with `stagehydrograph`**
 
@@ -31,6 +33,8 @@ Workflow
 
 Workflow Examples
 --------------------------
+
+More examples located in `workflow-examples.R`.
 
 ``` r
 # single site, single report
