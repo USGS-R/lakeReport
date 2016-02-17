@@ -16,19 +16,19 @@ Workflow
 
 | Input | Type | Description |
 | --- | --- | --- |
-| `siteNumber` | string, value or vector | the USGS station number OR `auto` |
-| `wy` | numeric, value | water year |
-| `plotNames` | character, value or vector | options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto` |
-| `output` | string, value | the format you would like the file saved as [options: `pdf` or `word`] |
+| `siteNumber` | string value or vector | the USGS station number OR `auto` |
+| `wy` | numeric value | water year |
+| `plotNames` | character value or vector | the name of the plot type you would like to produce [options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto`] |
+| `output` | string value | the format you would like the file saved as [options: `pdf` or `word`] |
 
 
 **Optional Inputs for `makeReports` function with `stagehydrograph`**
 
 | Input | Type | Description |
 | --- | --- | --- |
-| `filepath` | string, value | indicates where your csv is located |
-| `dateTime` | string, value | indicates the column name in your csv where dates are stored |
-| `gageHeight` | string, value | indicates the column name in your csv where gage heights are stored |
+| `filepath` | string value | indicates where your csv is located |
+| `dateTime` | string value | indicates the column name in your csv where dates are stored |
+| `gageHeight` | string value | indicates the column name in your csv where gage heights are stored |
 
 
 Workflow Examples
