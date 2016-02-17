@@ -18,7 +18,7 @@ Workflow
 | --- | --- | --- |
 | `siteNumber` | string value or vector | the USGS station number OR `auto` |
 | `wy` | numeric value | water year |
-| `plotNames` | character value or vector | the name of the plot type you would like to produce [options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto`] |
+| `plotNames` | string value or vector | the name of the plot type you would like to produce [options: `ghtable`, `stagehydrograph`, `qwtable`, `depthprofiles`, `qwtimeseries`, `auto`] |
 | `output` | string value | the format you would like the file saved as [options: `pdf` or `word`] |
 
 
