@@ -15,21 +15,19 @@ source("../R/functions-depthprofiles.R")
 wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
 wy_end <- as.POSIXct(paste0(wy, "-09-30"))
 
+# pull in ranges from csv file & filter for just this site
+column_classes <- c(rep("character", 2), rep("numeric", 8))
+plotRanges <- read.csv("../data/depthProfileRanges.csv", colClass=column_classes) %>% 
+  filter(site_no == siteNumber)
+
 pcodes <- c("00098", "00300", "00010", "00400", "00095")
 
 qw_nwis <- readNWISqw(siteNumbers = siteNumber, 
                       parameterCd = pcodes, 
                       startDate = wy_start, 
-                      endDat = wy_end)
+                      endDate = wy_end)
 
-station_nm <- attributes(qw_nwis)$siteInfo$station_nm
-site_no <- attributes(qw_nwis)$siteInfo$site_no
-table_caption <- paste0("LAKE-DEPTH PROFILES, ", 
-                        formatDate(qw_nwis$sample_dt[1]), " TO ",
-                        formatDate(tail(qw_nwis$sample_dt, 1)))
-last_index <- length(qw_nwis$sample_dt)
-
-prof_data <- makeLakeDepthProfiles(qw_nwis)
+prof_data <- filterLakeDepthProfileData(qw_nwis)
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
@@ -46,46 +44,51 @@ h2otemp_title <- "WATER TEMPERATURE (W.T.) IN DEGREES CELCIUS"
 PH_title <- "PH IN STANDARD UNITS"
 specifcond_title <- "SPECIFIC CONDUCTANCE (S.C.) IN MICROSIEMENS PER CENTIMETER AT 25 DEGREES CELCIUS"
 
+#figuring out how many 2x4 sets there are, and then how many extra
 num_2x4_plots <- floor(length(dates_uniq)/4)
 num_extra_dates <- length(dates_uniq)%%4
 
-#set plot options for margins
+#set plot options for margins (in order to fit text)
 par(oma = c(5,4,4,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
 #2x4 plots
-d <- 1
-for(p in seq(num_2x4_plots)){
-  if(p > 1){cat("\n\\newpage\n")}
-  dts <- dates_uniq[d:(p*4)]
+if(num_2x4_plots != 0){
 
-  plot_setup <- matrix(1:8, 2, 4)
-  layout(plot_setup)
-  for(t in seq_along(dts)){
-    left_logic <- t == 1
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
-                           DO_title, h2otemp_title, left_logic))
-    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE, 
-                           PH_title, specifcond_title, left_logic))
-  }
+  d <- 1
+  for(p in seq(num_2x4_plots)){
+    if(p > 1){cat("\n\\newpage\n")}
+    dts <- dates_uniq[d:(p*4)]
   
-  #add titles around the plot
-  title(ylab = "DEPTH, IN METERS",
-        outer = TRUE, line = 2)
-  title(xlab = specifcond_title,
-        outer = TRUE, line = 1)
-  title(xlab = PH_title,
-        outer = TRUE, line = -17)
-  title(xlab = h2otemp_title,
-        outer = TRUE, line = -19.5)
-  title(xlab = DO_title,
-        outer = TRUE, line = -37.5)
+    plot_setup <- matrix(1:8, 2, 4)
+    layout(plot_setup)
+    for(t in seq_along(dts)){
+      left_logic <- t == 1 #is it the farthest left plot
+      print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+                             filter_date = dts[t], top = TRUE, 
+                             left = left_logic, xranges = plotRanges))
+      print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+                             filter_date = dts[t], top = FALSE, 
+                             left = left_logic, xranges = plotRanges))
+    }
+    
+    #add titles around the plot
+    title(ylab = "DEPTH, IN METERS",
+          outer = TRUE, line = 2)
+    title(xlab = specifcond_title,
+          outer = TRUE, line = 1)
+    title(xlab = PH_title,
+          outer = TRUE, line = -17.5)
+    title(xlab = h2otemp_title,
+          outer = TRUE, line = -19.5)
+    title(xlab = DO_title,
+          outer = TRUE, line = -37.5)
+  
+    d <- (p*4)+1
+  }
+} 
 
-  d <- (p*4)+1
-}
-
-
-#extras 
+#extra plots that don't make a full 2x4 set 
 dts <- tail(dates_uniq, num_extra_dates)
 if(length(dts) > 0){
   cat("\n\\newpage\n")
@@ -93,11 +96,13 @@ if(length(dts) > 0){
   plot_setup <- matrix(1:8, 2, 4)
   layout(plot_setup)
   for(t in seq_along(dts)){
-    left_logic <- t == 1
-    print(depthProfilePlot(h2otemp, DO, dts[t], top=TRUE,
-                           DO_title, h2otemp_title, left_logic))
-    print(depthProfilePlot(specifcond, PH, dts[t], top=FALSE,
-                           PH_title, specifcond_title, left_logic))
+    left_logic <- t == 1 #is it the farthest left plot
+    print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+                           filter_date = dts[t], top = TRUE, 
+                           left=left_logic, xranges=plotRanges))
+    print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+                           filter_date = dts[t], top = FALSE, 
+                           left = left_logic, xranges = plotRanges))
   }
   
   #add titles around the plot
@@ -106,7 +111,7 @@ if(length(dts) > 0){
   title(xlab = specifcond_title,
         outer = TRUE, line = 1)
   title(xlab = PH_title,
-        outer = TRUE, line = -17)
+        outer = TRUE, line = -17.5)
   title(xlab = h2otemp_title,
         outer = TRUE, line = -19.5)
   title(xlab = DO_title,

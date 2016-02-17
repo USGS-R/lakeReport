@@ -1,3 +1,6 @@
+---
+classoption: landscape
+---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 library(dataRetrieval)
@@ -16,24 +19,8 @@ stage_data <- readNWISdata(service = "dv", sites = siteNumber,
                            parameterCd = "00065", startDate = "1800-01-01", 
                            endDate = wy_end)
 
-station_nm <- attributes(stage_data)$siteInfo$station_nm
-site_no <- attributes(stage_data)$siteInfo$site_no
-last_index <- length(stage_data$dateTime)
-
 ghtable <- makeGageHeightTable(stage_data, wy_start) 
-```
-
-## `r getAttr(stage_data, 'site_no')` `r getAttr(stage_data, 'station_nm')`
-
-### LOCATION.--Lat `r getAttr(stage_data, 'dec_lat_va')`, long `r getAttr(stage_data, 'dec_lon_va')` 
-
-*****
-
-GAGE HEIGHT, FEET
-
-`r paste("WATER YEAR OCTOBER", wy-1, "TO SEPTEMBER", wy)`
-
-DAILY MEAN VALUES
+``` 
 
 `r isWord <- output == "word"`
 ```{r eval=!isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
@@ -45,6 +32,11 @@ print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
 ```
 
 ```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
-library(knitr)
-kable(ghtable)
+library(pander)
+panderOptions('missing', '--')
+panderOptions('digits', 4)
+panderOptions('keep.trailing.zeros', TRUE)
+panderOptions('table.continues', NULL)
+panderOptions('table.split.table', Inf)
+pander(ghtable)
 ```

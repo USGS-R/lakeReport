@@ -15,20 +15,24 @@ source("../R/functions-stagehydrograph.R")
 wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
 wy_end <- as.POSIXct(paste0(wy, "-09-30"))
 
-stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
+extraInfo <- list(...)
+
+if(!is.null(extraInfo$filePath)){
+  stage_data <- read.csv(extraInfo$filePath)
+  stagehydrograph <- makeStageHydrograph_file(stage_data, 
+                                              extraInfo$dateTime, 
+                                              extraInfo$gageHeight)
+} else {
+  stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
                            parameterCd = "00065", startDate = "1800-01-01", 
                            endDate = wy_end)
 
-station_nm <- attributes(stage_data)$siteInfo$station_nm
-last_index <- length(stage_data$dateTime)
+  stagehydrograph <- makeStageHydrograph_dataRetrieval(stage_data)
+}
 
-stagehydrograph <- makeStageHydrograph(stage_data)
 ```
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 14}
 stagehydrograph
 ```
-
-
-Stage hydrograph for `r station_nm`, `r paste(year(stage_data$dateTime[c(1, last_index)]), collapse = "-")`
