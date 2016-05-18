@@ -12,8 +12,9 @@ source("../R/functions-ghtable.R")
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-wy_start <- as.POSIXct(paste0(wy-1, "-10-01"))
-wy_end <- as.POSIXct(paste0(wy, "-09-30"))
+wy_dates <- convertWYtoDate(wy)
+wy_start <- wy_dates$wy_start
+wy_end <- wy_dates$wy_end
 
 stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
                            parameterCd = "00065", startDate = "1800-01-01", 
