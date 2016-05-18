@@ -71,3 +71,9 @@ formatDate <- function(date){
          day(date), ", ",
          year(date))
 }
+
+convertWYtoDate <- function(wy){
+  s <- as.POSIXct(paste0(wy-1, "-10-01"), tz = "UTC")
+  e <- as.POSIXct(paste0(wy, "-09-30"), tz = "UTC")
+  return(list(wy_start = s, wy_end = e))
+}
