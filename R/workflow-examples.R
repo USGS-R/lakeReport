@@ -8,7 +8,7 @@ siteNumber <- '05390500'
 plotNames <- c('ghtable', 'stagehydrograph')
 makeReports(siteNumber, wy, plotNames, 'pdf')
 
-siteNumber <- '455638089034501'
+siteNumber <- '423556088365001'
 plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
 makeReports(siteNumber, wy, plotNames, 'pdf')
 
@@ -20,7 +20,7 @@ siteNumber <- '05390500'
 plotNames <- c('ghtable', 'stagehydrograph')
 makeReports(siteNumber, wy, plotNames, 'word')
 
-siteNumber <- '455638089034501'
+siteNumber <- '423556088365001'
 plotNames <- c('qwtable', 'depthprofiles', 'qwtimeseries')
 makeReports(siteNumber, wy, plotNames, 'word')
 

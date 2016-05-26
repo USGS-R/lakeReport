@@ -1,5 +1,8 @@
 ---
 classoption: landscape
+output: 
+  word_document:
+    reference_docx: table_style.docx
 ---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -27,27 +30,36 @@ qw_nwis <- tryCatch({readNWISqw(siteNumbers = siteNumber,
                     })
 
 if(!is.null(qw_nwis)){
-  qwtable <- makeWqTable(qw_nwis)
+  qwtables_list <- makeWqTable(qw_nwis)
 } else {
-  cat("No data returned for", siteNumber, "from", as.character(wy_start), "to", as.character(wy_end))
+  qwtables_list <- paste("No data returned for", siteNumber, "from", 
+                         as.character(wy_start), "to", as.character(wy_end))
 }
 ```
+
+`r isData <- class(qwtables_list) == "list"`
+
+#`r if(!isData) {qwtables_list}`#
 
 `r isWord <- !is.null(qw_nwis) & output == "word"`
 `r isOther <- !is.null(qw_nwis) & output != "word"`
 
-```{r eval = isOther, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+```{r eval = isOther && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(xtable)
 
-qwtable$sample_dt <- as.character(qwtable$sample_dt)
+for(t in seq(length(qwtables_list))){
+  qwtable <- qwtables_list[[t]]
+  qwtable$Date <- as.character(qwtable$Date)
 
-options(xtable.comment = FALSE)
-qw_xtable <- xtable(qwtable, auto=TRUE)
-print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
+  options(xtable.comment = FALSE)
+  qw_xtable <- xtable(qwtable, auto=TRUE)
+  print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
+}
+
 ```
 
 
-```{r eval = isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+```{r eval = isWord && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(pander)
 panderOptions('missing', '--')
 panderOptions('digits', 4)
@@ -55,5 +67,9 @@ panderOptions('keep.trailing.zeros', TRUE)
 panderOptions('table.continues', NULL)
 panderOptions('table.split.table', Inf)
 panderOptions('table.alignment.default', 'left')
-pander(qwtable)
+panderOptions('knitr.auto.asis', FALSE)
+
+for(t in seq(length(qwtables_list))){
+  pander(qwtables_list[[t]])
+}
 ```

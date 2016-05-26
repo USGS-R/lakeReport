@@ -19,6 +19,13 @@ qw_historic <- readNWISqw(siteNumbers = siteNumber,
                           startDate = "1800-01-01", 
                           endDat = wy_end)
 
+isData <- nrow(qw_historic)!=0
+
+```
+
+#`r if(!isData) {paste("No water quality data available for", siteNumber)}`#
+
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, fig.height = 14, fig.width=11}
 totalP <- filterParmData(qw_historic, "00665") 
 chlorophyll <- filterParmData(qw_historic, "32210")
 secchi <- filterParmData(qw_historic, "00078")

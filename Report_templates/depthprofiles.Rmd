@@ -28,10 +28,20 @@ qw_nwis <- readNWISqw(siteNumbers = siteNumber,
                       startDate = wy_start, 
                       endDate = wy_end)
 
-prof_data <- filterLakeDepthProfileData(qw_nwis)
+if(nrow(qw_nwis)!=0){
+  prof_data <- filterLakeDepthProfileData(qw_nwis)
+} else {
+  prof_data <- paste0("No water quality data available \n",
+                      "http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=",
+                      siteNumber)
+}
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
+`r isData <- class(prof_data) == "list"`
+
+#`r if(!isData) {prof_data}`#
+
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
 #grab data from big list
 dates_uniq <- prof_data$dates_uniq
 DO <- prof_data$DO
