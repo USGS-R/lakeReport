@@ -19,12 +19,21 @@ wy_end <- wy_dates$wy_end
 stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
                            parameterCd = "00065", startDate = "1800-01-01", 
                            endDate = wy_end)
-
-ghtable <- makeGageHeightTable(stage_data, wy_start) 
+if(nrow(stage_data)!=0){
+  ghtable <- makeGageHeightTable(stage_data, wy_start)
+} else {
+  ghtable <- paste0("No gage height data available \n",
+                  "http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=",
+                  siteNumber)
+}
 ``` 
 
+`r isData <- !is.null(dim(ghtable))`
+
+#`r if(!isData) {ghtable}`#
+
 `r isWord <- output == "word"`
-```{r eval=!isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+```{r eval=!isWord && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(xtable)
 options(xtable.comment = FALSE)
 
@@ -32,7 +41,7 @@ gh_xtable <- xtable(ghtable, auto=TRUE)
 print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
 ```
 
-```{r eval=isWord, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
+```{r eval=isWord && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(pander)
 panderOptions('missing', '--')
 panderOptions('digits', 4)

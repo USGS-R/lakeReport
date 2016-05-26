@@ -28,12 +28,21 @@ if(!is.null(extraInfo$filePath)){
                            parameterCd = "00065", startDate = "1800-01-01", 
                            endDate = wy_end)
 
-  stagehydrograph <- makeStageHydrograph_dataRetrieval(stage_data)
+  if(nrow(stage_data)!=0){
+    stagehydrograph <- makeStageHydrograph_dataRetrieval(stage_data)
+  } else {
+    stagehydrograph <- paste0("No stage data available \n",
+                              "http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=",
+                              siteNumber)
+  }
 }
 
 ```
 
+`r isPlot <- class(stagehydrograph) == "gsplot"`
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 14}
+#`r if(!isPlot) {stagehydrograph}`#
+
+```{r eval=isPlot, echo=FALSE, warning=FALSE, message=FALSE, fig.width = 14}
 stagehydrograph
 ```
