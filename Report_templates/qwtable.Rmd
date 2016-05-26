@@ -27,16 +27,16 @@ qw_nwis <- tryCatch({readNWISqw(siteNumbers = siteNumber,
                     })
 
 if(!is.null(qw_nwis)){
-  qwtable <- makeWqTable(qw_nwis)
+  qwtables_list <- makeWqTable(qw_nwis)
 } else {
-  qwtable <- paste("No data returned for", siteNumber, "from", 
-                   as.character(wy_start), "to", as.character(wy_end))
+  qwtables_list <- paste("No data returned for", siteNumber, "from", 
+                         as.character(wy_start), "to", as.character(wy_end))
 }
 ```
 
-`r isData <- !is.null(dim(qwtable))`
+`r isData <- class(qwtables_list) == "list"`
 
-#`r if(!isData) {qwtable}`#
+#`r if(!isData) {qwtables_list}`#
 
 `r isWord <- !is.null(qw_nwis) & output == "word"`
 `r isOther <- !is.null(qw_nwis) & output != "word"`
@@ -44,11 +44,15 @@ if(!is.null(qw_nwis)){
 ```{r eval = isOther && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(xtable)
 
-qwtable$sample_dt <- as.character(qwtable$sample_dt)
+for(t in seq(length(qwtables_list))){
+  qwtable <- qwtables_list[[t]]
+  qwtable$Date <- as.character(qwtable$Date)
 
-options(xtable.comment = FALSE)
-qw_xtable <- xtable(qwtable, auto=TRUE)
-print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
+  options(xtable.comment = FALSE)
+  qw_xtable <- xtable(qwtable, auto=TRUE)
+  print.xtable(qw_xtable, NA.string = "--", include.rownames=FALSE)
+}
+
 ```
 
 
@@ -60,5 +64,9 @@ panderOptions('keep.trailing.zeros', TRUE)
 panderOptions('table.continues', NULL)
 panderOptions('table.split.table', Inf)
 panderOptions('table.alignment.default', 'left')
-pander(qwtable)
+panderOptions('knitr.auto.asis', FALSE)
+
+for(t in seq(length(qwtables_list))){
+  pander(qwtables_list[[t]])
+}
 ```
