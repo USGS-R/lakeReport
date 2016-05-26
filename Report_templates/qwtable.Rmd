@@ -1,6 +1,8 @@
 ---
 classoption: landscape
-reference_docx: qwtable_style.docx
+output: 
+  word_document:
+    reference_docx: table_style.docx
 ---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
