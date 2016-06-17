@@ -31,6 +31,13 @@ chlorophyll <- filterParmData(qw_historic, "32210")
 secchi <- filterParmData(qw_historic, "00078")
 trophic <- calcTrophicIndex(totalP, secchi, chlorophyll)
 
+# getting correct dates for labels/axis ticks
+all_dates <- year(c(totalP$sample_dt, chlorophyll$sample_dt, secchi$sample_dt, trophic$sample_dt))
+firstDate <- as.Date(paste0(min(all_dates), "-01-01"))
+lastDate <- as.Date(format(wy_dates$wy_end, "%Y-12-31"))
+yrs <- seq(firstDate, lastDate, by = "years")
+date_info <- list(firstDate = firstDate, lastDate = lastDate, yrs = yrs)
+
 totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
 chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
@@ -41,13 +48,13 @@ par(oma = c(1,4,4,0) + 0.1,
 
 plot_layout <- matrix(1:4, 4, 1)
 layout(plot_layout)
-makeTimeseriesPlot(totalP, totalP_title, 
-                   isTrophicIndex = FALSE, axisFlip = FALSE)
-makeTimeseriesPlot(chlorophyll, chlorophyll_title, 
-                   isTrophicIndex = FALSE, axisFlip = FALSE)
-makeTimeseriesPlot(secchi, secchi_title, 
-                   isTrophicIndex = FALSE, axisFlip = TRUE)
-makeTimeseriesPlot(trophic, trophic_title, 
-                   isTrophicIndex = TRUE, axisFlip = FALSE)
+makeTimeseriesPlot(totalP, totalP_title, isTrophicIndex = FALSE, 
+                   axisFlip = FALSE, date_info = date_info, ylim_buffer = 0.05)
+makeTimeseriesPlot(chlorophyll, chlorophyll_title, isTrophicIndex = FALSE, 
+                   axisFlip = FALSE, date_info = date_info, ylim_buffer = 1)
+makeTimeseriesPlot(secchi, secchi_title, isTrophicIndex = FALSE, 
+                   axisFlip = TRUE, date_info = date_info, ylim_buffer = 0.5)
+makeTimeseriesPlot(trophic, trophic_title, isTrophicIndex = TRUE, 
+                   axisFlip = FALSE, date_info = date_info)
 ```
 

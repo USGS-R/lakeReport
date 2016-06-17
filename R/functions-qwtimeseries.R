@@ -7,11 +7,12 @@
 filterParmData <- function(data, pcode){
   data %>% 
     filter(parm_cd == pcode) %>% 
-    select(sample_dt, result_va, coll_ent_cd)
+    select(sample_dt, result_va, coll_ent_cd) %>% 
+    mutate(result_va = as.numeric(result_va))
 }
 
 calcTrophicIndex <- function(totalP, chlorophyll, secchi){
-  
+
   totalP <- totalP %>% 
     mutate(TSI = 4.15 + (14.42 * log(totalP$result_va * 1000))) %>% 
     mutate(Timeseries = rep('totalP', nrow(totalP)))
@@ -26,79 +27,95 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
-  if(!isTrophicIndex){
-    usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
-    observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
-
-    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1) %>% 
-      
-      # adding data to plot
-      points(x = usgs$sample_dt, y = usgs$result_va, 
-             legend.name = "USGS",
-             pch = 18, col = "black") %>% 
-      points(x = observer$sample_dt, y = observer$result_va, 
-             legend.name = "Observer",
-             pch = 1, col = "black")
-    
-    # only include legend on the top plot
-    if(length(grep("PHOSPHORUS", title)) > 0){ 
-      parm_plot <- parm_plot %>%
-        legend()
-    }
-    
+makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_info, ylim_buffer = NULL){
+  
+  if(nrow(parm_data) == 0){
+    parm_plot <- 'No data available'
   } else {
-    totalP <- filter(parm_data, Timeseries == 'totalP')
-    secchi <- filter(parm_data, Timeseries == 'secchi')
-    chlorophyll <- filter(parm_data, Timeseries == 'chlorophyll')
-    
-    olig_pos <- median(c(min(parm_data$TSI), 40))
-    eutr_pos <- median(c(50, max(parm_data$TSI)))
-    
-    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4) %>% 
-
-      # adding data to the plot
-      lines(x = totalP$sample_dt, y = totalP$TSI, 
-            lty = 2, legend.name = "Total Phosphorus") %>% 
-      lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
-            lty = 1, legend.name = "Chlorophyll a") %>%
-      lines(x = secchi$sample_dt, y=secchi$TSI, 
-            lty = 3, legend.name = "Secchi depth") %>%
+  
+    if(!isTrophicIndex){
+      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
+      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
+  
+      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
+        
+        # adding data to plot
+        points(x = usgs$sample_dt, y = usgs$result_va, 
+               legend.name = "USGS",
+               pch = 18, col = "black") %>% 
+        points(x = observer$sample_dt, y = observer$result_va, 
+               legend.name = "Observer",
+               pch = 1, col = "black")
       
-      # defining trophic zones
-      abline(h = c(40,50), lty = 5) %>% 
-      text(x = min(parm_data$sample_dt), y = c(olig_pos, 45, eutr_pos), 
-           cex = 0.8, pos = 4,
-           labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
+      # only include legend on the top plot
+      if(length(grep("PHOSPHORUS", title)) > 0){ 
+        parm_plot <- parm_plot %>%
+          legend()
+      }
       
-      # adding the legend (no box around it)
-      legend(bty = 'n')
-    
+    } else {
+      totalP <- filter(parm_data, Timeseries == 'totalP')
+      secchi <- filter(parm_data, Timeseries == 'secchi')
+      chlorophyll <- filter(parm_data, Timeseries == 'chlorophyll')
+      
+      olig_pos <- median(c(min(parm_data$TSI), 40))
+      eutr_pos <- median(c(50, max(parm_data$TSI)))
+      
+      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info, ylim_buffer) %>% 
+  
+        # adding data to the plot
+        lines(x = totalP$sample_dt, y = totalP$TSI, 
+              lty = 2, legend.name = "Total Phosphorus") %>% 
+        lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
+              lty = 1, legend.name = "Chlorophyll a") %>%
+        lines(x = secchi$sample_dt, y=secchi$TSI, 
+              lty = 3, legend.name = "Secchi depth") %>%
+        
+        # defining trophic zones
+        abline(h = c(40,50), lty = 5) %>% 
+        text(x = min(parm_data$sample_dt), y = c(olig_pos, 45, eutr_pos), 
+             cex = 0.8, pos = 4,
+             labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
+        
+        # adding the legend (no box around it)
+        legend(bty = 'n')
+      
+    }
   }
   return(parm_plot)
 }
 
-plotSetup <- function(parm_data, title, axisFlip, y_n.minor){
-  # getting correct dates for labels/axis ticks
-  unique_yrs <- unique(year(parm_data$sample_dt))
-  startOfWy <- as.Date(paste0(unique_yrs, "-10-01"))
-  startOfYear <- as.Date(paste0(unique_yrs, "-01-01"))
-  endOfYear <- as.Date(paste0(unique_yrs, "-12-31"))
+plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buffer){
+
+  #ylim_buffer is NULL for trophic index plot
+  if(is.null(ylim_buffer)){
+    ymin <- min(parm_data$TSI)
+    ymax <- max(parm_data$TSI)
+    ymin_buffer <- ymin%%10
+    ymax_buffer <- ifelse(ymax%%10 == 0, 0, 10 - ymax%%10)
+  } else {
+    ymin <- min(parm_data$result_va)
+    ymax <- max(parm_data$result_va)
+    ymin_buffer <- ymax_buffer <- ylim_buffer
+  }
+  
+  ymin <- ymin - ymin_buffer
+  ymin <- ifelse(ymin < 0, 0, ymin)
+  ymax <- ymax + ymax_buffer
   
   parm_plot <- gsplot() %>% 
     # setting up plot limits
     points(NA, NA, 
            ylab = title, 
-           xlim = c(startOfYear[1], 
-                    tail(endOfYear, 1))) %>% 
+           xlim = c(date_info$firstDate, date_info$lastDate),
+           ylim = c(ymin, ymax)) %>% 
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
     axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = startOfYear, n.minor = 11,
-         labels = FALSE) %>%
-    mtext(side = 1, text = format(startOfWy, "%Y"), at = startOfWy, line = 1) %>% 
-    axis(side = 3, at = startOfYear, n.minor = 11, 
+    axis(side = 1, at = date_info$yrs, n.minor = 10,
+         labels = year(date_info$yrs)) %>% 
+    axis(side = 3, at = date_info$yrs, n.minor = 10, 
          labels = FALSE)
   
   return(parm_plot)
