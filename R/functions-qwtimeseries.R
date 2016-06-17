@@ -26,12 +26,12 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
+makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_info){
   if(!isTrophicIndex){
     usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
     observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
 
-    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1) %>% 
+    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info) %>% 
       
       # adding data to plot
       points(x = usgs$sample_dt, y = usgs$result_va, 
@@ -55,7 +55,7 @@ makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
     olig_pos <- median(c(min(parm_data$TSI), 40))
     eutr_pos <- median(c(50, max(parm_data$TSI)))
     
-    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4) %>% 
+    parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info) %>% 
 
       # adding data to the plot
       lines(x = totalP$sample_dt, y = totalP$TSI, 
@@ -78,27 +78,20 @@ makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip){
   return(parm_plot)
 }
 
-plotSetup <- function(parm_data, title, axisFlip, y_n.minor){
-  # getting correct dates for labels/axis ticks
-  unique_yrs <- unique(year(parm_data$sample_dt))
-  startOfWy <- as.Date(paste0(unique_yrs, "-10-01"))
-  startOfYear <- as.Date(paste0(unique_yrs, "-01-01"))
-  endOfYear <- as.Date(paste0(unique_yrs, "-12-31"))
-  
+plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info){
+
   parm_plot <- gsplot() %>% 
     # setting up plot limits
     points(NA, NA, 
            ylab = title, 
-           xlim = c(startOfYear[1], 
-                    tail(endOfYear, 1))) %>% 
+           xlim = c(date_info$firstDate, date_info$lastDate)) %>% 
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
     axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = startOfYear, n.minor = 11,
-         labels = FALSE) %>%
-    mtext(side = 1, text = format(startOfWy, "%Y"), at = startOfWy, line = 1) %>% 
-    axis(side = 3, at = startOfYear, n.minor = 11, 
+    axis(side = 1, at = date_info$yrs, n.minor = 10,
+         labels = year(date_info$yrs)) %>% 
+    axis(side = 3, at = date_info$yrs, n.minor = 10, 
          labels = FALSE)
   
   return(parm_plot)
