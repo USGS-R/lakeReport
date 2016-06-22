@@ -21,7 +21,8 @@ filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
   if(isTotalP){
     parm_data <- parm_data %>% 
       group_by(sample_dt) %>% 
-      filter(sample_depth == min(sample_depth))
+      filter(sample_depth == min(sample_depth)) %>% 
+      ungroup()
   }
   
   return(parm_data)
