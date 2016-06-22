@@ -7,7 +7,7 @@
 filterParmData <- function(data, pcode){
   data %>% 
     filter(parm_cd == pcode) %>% 
-    select(sample_dt, result_va, coll_ent_cd) %>% 
+    select(sample_dt, result_va, remark_cd, coll_ent_cd) %>% 
     mutate(result_va = as.numeric(result_va))
 }
 
@@ -35,23 +35,32 @@ makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex = FALSE,
   } else {
   
     if(!isTrophicIndex){
-      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
-      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
+      
+      col_censored <- "red"
+      col_uncensored <- "black"
+      pch_usgs <- 18
+      pch_observer <- 1
+      
+      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER") %>% 
+        mutate(symbolColor = ifelse(is.na(remark_cd), col_uncensored, col_censored))
+      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% 
+        mutate(symbolColor = ifelse(is.na(remark_cd), col_uncensored, col_censored))
   
       parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
         
         # adding data to plot
         points(x = usgs$sample_dt, y = usgs$result_va, 
-               legend.name = "USGS",
-               pch = 18, col = "black") %>% 
+               pch = pch_usgs, col = usgs$symbolColor) %>% 
         points(x = observer$sample_dt, y = observer$result_va, 
-               legend.name = "Observer",
-               pch = 1, col = "black")
+               pch = pch_observer, col = observer$symbolColor) 
       
       # only include legend on the top plot
       if(length(grep("PHOSPHORUS", title)) > 0){ 
         parm_plot <- parm_plot %>%
-          legend()
+          legend(pch = c(pch_usgs,pch_usgs,pch_observer,pch_observer), 
+                 col = rep(c(col_uncensored, col_censored),2), 
+                 legend = c("USGS - Uncensored", "USGS - Censored", 
+                            "Observer - Uncensored", "Observer - Censored"))
       }
       
     } else {
