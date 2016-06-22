@@ -27,7 +27,8 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_info, ylim_buffer = NULL){
+makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex = FALSE, 
+                               axisFlip = FALSE, date_info, ylim_buffer = NULL){
   
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -87,6 +88,19 @@ makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_
 
 plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buffer){
 
+  # x axis format depends on total length of time for the plot
+  timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
+  if(timeperiod <= 10){
+    x_at <- date_info$yrs
+    x_n.minor <- 11
+  } else if(timeperiod <= 20){
+    x_at <- date_info$yrs
+    x_n.minor <- 0
+  } else if(timeperiod > 20){
+    x_at <- seq(date_info$firstDate, date_info$lastDate, by="5 years")
+    x_n.minor <- 0
+  }
+  
   #ylim_buffer is NULL for trophic index plot
   if(is.null(ylim_buffer)){
     ymin <- min(parm_data$TSI)
@@ -113,10 +127,8 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
     axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = date_info$yrs, n.minor = 10,
-         labels = year(date_info$yrs)) %>% 
-    axis(side = 3, at = date_info$yrs, n.minor = 10, 
-         labels = FALSE)
+    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at)) %>% 
+    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE)
   
   return(parm_plot)
 }
