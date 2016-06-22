@@ -4,11 +4,27 @@
 # pcode = 32210 for chlorophyll (ug/L)
 # pcode = 00078 for secchi depth (meters)
 
-filterParmData <- function(data, pcode){
-  data %>% 
+filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
+  parm_data <- data %>% 
     filter(parm_cd == pcode) %>% 
-    select(sample_dt, result_va, remark_cd, coll_ent_cd) %>% 
+    select(sample_dt, sample_tm, result_va, remark_cd, coll_ent_cd) %>% 
     mutate(result_va = as.numeric(result_va))
+  
+  if(!is.null(depth_df)){
+    depth_df <- depth_df %>% 
+      rename(sample_depth = result_va) %>% 
+      select(-coll_ent_cd, -remark_cd)
+    parm_data <- left_join(parm_data, depth_df, by = c('sample_dt', 'sample_tm')) %>% 
+      select(-sample_tm)
+  }
+  
+  if(isTotalP){
+    parm_data <- parm_data %>% 
+      group_by(sample_dt) %>% 
+      filter(sample_depth == min(sample_depth))
+  }
+  
+  return(parm_data)
 }
 
 calcTrophicIndex <- function(totalP, chlorophyll, secchi){
