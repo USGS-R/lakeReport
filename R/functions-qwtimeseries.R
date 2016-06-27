@@ -4,11 +4,28 @@
 # pcode = 32210 for chlorophyll (ug/L)
 # pcode = 00078 for secchi depth (meters)
 
-filterParmData <- function(data, pcode){
-  data %>% 
+filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
+  parm_data <- data %>% 
     filter(parm_cd == pcode) %>% 
-    select(sample_dt, result_va, coll_ent_cd) %>% 
+    select(sample_dt, sample_tm, result_va, remark_cd, coll_ent_cd) %>% 
     mutate(result_va = as.numeric(result_va))
+  
+  if(!is.null(depth_df)){
+    depth_df <- depth_df %>% 
+      rename(sample_depth = result_va) %>% 
+      select(-coll_ent_cd, -remark_cd)
+    parm_data <- left_join(parm_data, depth_df, by = c('sample_dt', 'sample_tm')) %>% 
+      select(-sample_tm)
+  }
+  
+  if(isTotalP){
+    parm_data <- parm_data %>% 
+      group_by(sample_dt) %>% 
+      filter(sample_depth == min(sample_depth)) %>% 
+      ungroup()
+  }
+  
+  return(parm_data)
 }
 
 calcTrophicIndex <- function(totalP, chlorophyll, secchi){
@@ -27,30 +44,46 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_info, ylim_buffer = NULL){
+makeTimeseriesPlot <- function(parm_data, title, date_info, isGreenLake, isSecchi = FALSE,
+                               isTrophicIndex = FALSE, axisFlip = FALSE, ylim_buffer = NULL){
   
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
   } else {
   
     if(!isTrophicIndex){
-      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER")
-      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER")
-  
+      
+      col_censored <- "red"
+      col_uncensored <- "black"
+      pch_usgs <- 18
+      pch_observer <- 1
+      
+      parm_data <- parm_data %>% 
+        mutate(symbolColor = ifelse(is.na(remark_cd), col_uncensored, col_censored))
+      
+      if(isGreenLake && isSecchi){
+        usgs <- parm_data %>% filter(sample_depth != 0.1)
+        observer <- parm_data %>% filter(sample_depth == 0.1) 
+      } else {
+        usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER") 
+        observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER") 
+      }
+      
       parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
         
         # adding data to plot
         points(x = usgs$sample_dt, y = usgs$result_va, 
-               legend.name = "USGS",
-               pch = 18, col = "black") %>% 
+               pch = pch_usgs, col = usgs$symbolColor) %>% 
         points(x = observer$sample_dt, y = observer$result_va, 
-               legend.name = "Observer",
-               pch = 1, col = "black")
+               pch = pch_observer, col = observer$symbolColor) 
       
       # only include legend on the top plot
       if(length(grep("PHOSPHORUS", title)) > 0){ 
         parm_plot <- parm_plot %>%
-          legend()
+          legend(pch = c(pch_usgs,pch_usgs,pch_observer,pch_observer), 
+                 col = rep(c(col_uncensored, col_censored),2), 
+                 legend = c("USGS - Uncensored", "USGS - Censored", 
+                            "Observer - Uncensored", "Observer - Censored"))
       }
       
     } else {
@@ -87,6 +120,19 @@ makeTimeseriesPlot <- function(parm_data, title, isTrophicIndex, axisFlip, date_
 
 plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buffer){
 
+  # x axis format depends on total length of time for the plot
+  timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
+  if(timeperiod <= 10){
+    x_at <- date_info$yrs
+    x_n.minor <- 11
+  } else if(timeperiod <= 20){
+    x_at <- date_info$yrs
+    x_n.minor <- 0
+  } else if(timeperiod > 20){
+    x_at <- seq(date_info$firstDate, date_info$lastDate, by="5 years")
+    x_n.minor <- 0
+  }
+  
   #ylim_buffer is NULL for trophic index plot
   if(is.null(ylim_buffer)){
     ymin <- min(parm_data$TSI)
@@ -113,10 +159,8 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
     axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = date_info$yrs, n.minor = 10,
-         labels = year(date_info$yrs)) %>% 
-    axis(side = 3, at = date_info$yrs, n.minor = 10, 
-         labels = FALSE)
+    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at)) %>% 
+    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE)
   
   return(parm_plot)
 }

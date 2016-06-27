@@ -12,13 +12,14 @@ source("../R/functions-qwtimeseries.R")
 wy_dates <- convertWYtoDate(wy)
 wy_end <- wy_dates$wy_end
 
-pcodes <- c("00665", "00666", "32210", "00078")
+pcodes <- c("00665", "00666", "32210", "00078", "00098")
 
 qw_historic <- readNWISqw(siteNumbers = siteNumber, 
                           parameterCd = pcodes,
                           startDate = "1800-01-01", 
                           endDat = wy_end)
 
+isGreenLake <- siteNumber %in% c('434756089020500', '434928088570000')
 isData <- nrow(qw_historic)!=0
 
 ```
@@ -26,9 +27,10 @@ isData <- nrow(qw_historic)!=0
 #`r if(!isData) {paste("No water quality data available for", siteNumber)}`#
 
 ```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, fig.height = 14, fig.width=11}
-totalP <- filterParmData(qw_historic, "00665") 
-chlorophyll <- filterParmData(qw_historic, "32210")
-secchi <- filterParmData(qw_historic, "00078")
+depth <- filterParmData(qw_historic, "00098")
+totalP <- filterParmData(qw_historic, "00665", isTotalP = TRUE, depth) 
+chlorophyll <- filterParmData(qw_historic, "32210", depth)
+secchi <- filterParmData(qw_historic, "00078", depth)
 trophic <- calcTrophicIndex(totalP, secchi, chlorophyll)
 
 # getting correct dates for labels/axis ticks
@@ -48,13 +50,10 @@ par(oma = c(1,4,4,0) + 0.1,
 
 plot_layout <- matrix(1:4, 4, 1)
 layout(plot_layout)
-makeTimeseriesPlot(totalP, totalP_title, isTrophicIndex = FALSE, 
-                   axisFlip = FALSE, date_info = date_info, ylim_buffer = 0.05)
-makeTimeseriesPlot(chlorophyll, chlorophyll_title, isTrophicIndex = FALSE, 
-                   axisFlip = FALSE, date_info = date_info, ylim_buffer = 1)
-makeTimeseriesPlot(secchi, secchi_title, isTrophicIndex = FALSE, 
-                   axisFlip = TRUE, date_info = date_info, ylim_buffer = 0.5)
-makeTimeseriesPlot(trophic, trophic_title, isTrophicIndex = TRUE, 
-                   axisFlip = FALSE, date_info = date_info)
+makeTimeseriesPlot(totalP, totalP_title, date_info, isGreenLake, ylim_buffer = 0.05)
+makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, isGreenLake, ylim_buffer = 1)
+makeTimeseriesPlot(secchi, secchi_title, date_info, isGreenLake, isSecchi = TRUE, 
+                   axisFlip = TRUE, ylim_buffer = 0.5)
+makeTimeseriesPlot(trophic, trophic_title, date_info, isGreenLake, isTrophicIndex = TRUE)
 ```
 
