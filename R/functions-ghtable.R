@@ -40,5 +40,7 @@ makeGageHeightTable <- function(stage_data, wy_start){
   gh_table_final <- gh_table_display %>% 
     bind_rows(stats_mean, stats_max, stats_min)
   
+  gh_table_final[,-1] <- round(gh_table_final[,-1], 2)
+  
   return(gh_table_final)
 }
