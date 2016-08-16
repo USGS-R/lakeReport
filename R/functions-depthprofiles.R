@@ -52,13 +52,14 @@ filterByDate <- function(df, filter_date){
 
 depthProfilePlot <- function(side1, side3, filter_date, 
                              top, left, xranges){
+  # find range for all data
+  all_y <- c(side1[['depth']], side3[['depth']])
   
   # grab data only from current date
   side1_list <- filterByDate(side1, filter_date)
   side3_list <- filterByDate(side3, filter_date)
   
   # figure out yaxis major and minor ticks
-  all_y <- c(side1_list$y, side3_list$y)
   if(max(all_y) <= 10){
     yseq <- 2
     yn.minor <- 1
