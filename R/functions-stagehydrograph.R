@@ -12,7 +12,8 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
   
   gage_height_cont <- stage_data %>% 
     select(dateTime, ends_with("_00065_00003"), 
-           -starts_with("X_OBSERVER"), -starts_with('X_TAILWATER')) %>% 
+           -starts_with("X_OBSERVER")) %>% 
+    select(-starts_with('X_TAILWATER')) %>% 
     select(dateTime, gageHeight = ends_with("_00065_00003")) %>% 
     filter(!is.na(gageHeight)) 
   gage_height_all <- rbind(gage_height_obs, gage_height_cont)

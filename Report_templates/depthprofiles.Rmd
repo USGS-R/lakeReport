@@ -162,7 +162,7 @@ if(length(dts) > 0){
     plot.new()
     plot.new()
   }
-  
+
   #add titles around the plot
   title(ylab = "DEPTH, IN METERS",
         outer = TRUE, line = ylabel_line)
