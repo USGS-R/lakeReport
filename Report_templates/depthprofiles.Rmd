@@ -73,19 +73,7 @@ isEven <- num_extra_plots%%2 == 0
 
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-
-if(N == 4){
-  opts_chunk$set(fig.height = 6.5)
-  opts_chunk$set(fig.width = 6.5)
-} else if(N == 5){
-  opts_chunk$set(fig.height = 6.5)
-  opts_chunk$set(fig.width = 7)
-}
-
-```
-
-```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height=6.5}
 
 #set plot options for margins (in order to fit text)
 par(oma = c(5,4,4,0) + 0.1,
@@ -128,19 +116,10 @@ if(num_2xN_plots != 0){
 
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+`r if(isEven){opts_chunk$set(fig.width = 6.5)}`
+`r if(!isEven){opts_chunk$set(fig.width = 8)}`
 
-if(isEven){
-  opts_chunk$set(fig.height = 6.5)
-  opts_chunk$set(fig.width = 7)
-} else if(!isEven){
-  opts_chunk$set(fig.height = 6.5)
-  opts_chunk$set(fig.width = 8)
-}
-
-```
-
-```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height=6.5}
 
 #set plot options for margins (in order to fit text)
 par(oma = c(5,4,4,0) + 0.1,
