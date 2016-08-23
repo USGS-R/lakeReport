@@ -7,6 +7,7 @@ library(dataRetrieval)
 library(dplyr)
 library(lubridate)
 library(gsplot)
+library(knitr)
 
 source("../R/functions-depthprofiles.R")
 ```
@@ -41,7 +42,7 @@ if(nrow(qw_nwis)!=0){
 
 #`r if(!isData) {prof_data}`#
 
-```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.width=6.5, fig.height=6.5} 
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE} 
 #grab data from big list
 dates_uniq <- prof_data$dates_uniq
 DO <- prof_data$DO
@@ -56,22 +57,36 @@ PH_title <- "PH IN STANDARD UNITS"
 specifcond_title <- "SPECIFIC CONDUCTANCE (S.C.) IN MICROSIEMENS PER CENTIMETER AT 25 DEGREES CELCIUS"
 
 #figuring out how many 2x4 sets there are, and then how many extra
-num_2x4_plots <- floor(length(dates_uniq)/4)
-num_extra_dates <- length(dates_uniq)%%4
+num_plots <- length(dates_uniq)
+
+if(num_plots == 5){
+  N <- 5
+  opts_chunk$set(fig.width = 8)
+} else {
+  N <- 4
+  opts_chunk$set(fig.width = 6.5)
+}
+
+num_2xN_plots <- floor(num_plots/N)
+num_extra_plots <- num_plots%%N
+isEven <- num_extra_plots%%2 == 0
+
+```
+
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height=6.5}
 
 #set plot options for margins (in order to fit text)
 par(oma = c(5,4,4,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
-#2x4 plots
-if(num_2x4_plots != 0){
-
+#2x5 plots
+if(num_2xN_plots != 0){
+  plot_setup <- matrix(1:(N*2), 2, N)
   d <- 1
-  for(p in seq(num_2x4_plots)){
+  for(p in seq(num_2xN_plots)){
     if(p > 1){cat("\n\\newpage\n")}
-    dts <- dates_uniq[d:(p*4)]
+    dts <- dates_uniq[d:(p*N)]
   
-    plot_setup <- matrix(1:8, 2, 4)
     layout(plot_setup)
     for(t in seq_along(dts)){
       left_logic <- t == 1 #is it the farthest left plot
@@ -99,13 +114,40 @@ if(num_2x4_plots != 0){
   }
 } 
 
-#extra plots that don't make a full 2x4 set 
-dts <- tail(dates_uniq, num_extra_dates)
+```
+
+`r if(isEven){opts_chunk$set(fig.width = 6.5)}`
+`r if(!isEven){opts_chunk$set(fig.width = 8)}`
+
+```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height=6.5}
+
+#set plot options for margins (in order to fit text)
+par(oma = c(5,4,4,0) + 0.1,
+    mar = c(1,1,5,1) + 0.1)
+
+#extra plots that don't make a full 2x5 set 
+dts <- tail(dates_uniq, num_extra_plots)
 if(length(dts) > 0){
   cat("\n\\newpage\n")
   
-  plot_setup <- matrix(1:8, 2, 4)
+  num_plots_on_page <- ifelse(isEven, 4, 5)
+  num_before_after <- (num_plots_on_page - num_extra_plots)/2 #number of blank plots to center
+  if(num_extra_plots == 2){
+    ylabel_line <- -10
+  } else if(num_extra_plots == 3){
+    ylabel_line <- -7
+  } else {
+    ylabel_line <- 2
+  }
+  
+  plot_setup <- matrix(1:(2*num_plots_on_page), 2, num_plots_on_page)
   layout(plot_setup)
+
+  for(b in 1:num_before_after){
+    plot.new()
+    plot.new()
+  }
+  
   for(t in seq_along(dts)){
     left_logic <- t == 1 #is it the farthest left plot
     print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
@@ -116,9 +158,14 @@ if(length(dts) > 0){
                            left = left_logic, xranges = plotRanges))
   }
   
+  for(b in 1:num_before_after){
+    plot.new()
+    plot.new()
+  }
+  
   #add titles around the plot
   title(ylab = "DEPTH, IN METERS",
-        outer = TRUE, line = 2)
+        outer = TRUE, line = ylabel_line)
   title(xlab = specifcond_title,
         outer = TRUE, line = 1)
   title(xlab = PH_title,
