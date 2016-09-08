@@ -6,7 +6,7 @@
 
 filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
   parm_data <- data %>% 
-    filter(parm_cd == pcode) %>% 
+    filter(parm_cd %in% pcode) %>% 
     select(sample_dt, sample_tm, result_va, remark_cd, coll_ent_cd) %>% 
     mutate(result_va = as.numeric(result_va))
   
