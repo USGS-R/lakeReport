@@ -41,6 +41,8 @@ makeGageHeightTable <- function(stage_data, wy_start){
     bind_rows(stats_mean, stats_max, stats_min)
   
   gh_table_final[,-1] <- round(gh_table_final[,-1], 2)
+  gh_table_final[,-1] <- mapply(sprintf, gh_table_final[,-1], fmt="%.02f") # keep trailing zeros for two decimal places
+  gh_table_final[,-1] <- mapply(gsub, gh_table_final[,-1], pattern="NA", replacement="--") # rplace "NA" with "--"
   
   return(gh_table_final)
 }

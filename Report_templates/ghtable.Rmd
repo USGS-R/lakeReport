@@ -41,14 +41,11 @@ library(xtable)
 options(xtable.comment = FALSE)
 
 gh_xtable <- xtable(ghtable, auto=TRUE)
-print.xtable(gh_xtable, NA.string = "--", include.rownames=FALSE)
+print.xtable(gh_xtable, include.rownames=FALSE)
 ```
 
 ```{r eval=isWord && isData, echo=FALSE, warning=FALSE, message=FALSE, results='asis'} 
 library(pander)
-panderOptions('missing', '--')
-panderOptions('digits', 4)
-panderOptions('keep.trailing.zeros', TRUE)
 panderOptions('table.continues', NULL)
 panderOptions('table.split.table', Inf)
 pander(ghtable)
