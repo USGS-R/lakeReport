@@ -31,7 +31,7 @@ depth <- filterParmData(qw_historic, "00098")
 totalP <- filterParmData(qw_historic, "00665", isTotalP = TRUE, depth) 
 chlorophyll <- filterParmData(qw_historic, c("32210", "70953"), depth)
 secchi <- filterParmData(qw_historic, "00078", depth)
-trophic <- calcTrophicIndex(totalP, secchi, chlorophyll)
+trophic <- calcTrophicIndex(totalP, chlorophyll, secchi)
 
 # getting correct dates for labels/axis ticks
 all_dates <- year(c(totalP$sample_dt, chlorophyll$sample_dt, secchi$sample_dt, trophic$sample_dt))
