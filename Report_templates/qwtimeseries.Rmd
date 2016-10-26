@@ -51,10 +51,10 @@ par(oma = c(1,4,4,0) + 0.1,
 
 plot_layout <- matrix(1:4, 4, 1)
 layout(plot_layout)
-makeTimeseriesPlot(totalP, totalP_title, date_info, isGreenLake, ylim_buffer = 0.05)
-makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, isGreenLake, ylim_buffer = 0.05)
-makeTimeseriesPlot(secchi, secchi_title, date_info, isGreenLake, isSecchi = TRUE, 
+makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05)
+makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, ylim_buffer = 0.05)
+makeTimeseriesPlot(secchi, secchi_title, date_info,
                    axisFlip = TRUE, ylim_buffer = 0.05)
-makeTimeseriesPlot(trophic, trophic_title, date_info, isGreenLake, isTrophicIndex = TRUE)
+makeTimeseriesPlot(trophic, trophic_title, date_info, isTrophicIndex = TRUE)
 ```
 
