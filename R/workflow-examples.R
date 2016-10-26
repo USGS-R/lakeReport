@@ -1,8 +1,11 @@
 
 ##### Example workflows (after sourcing makeReports and renderLakeReport functions) ##### 
 
+# this doesn't work with the new gsplot v0.7 yet. Run this line to make sure you have v0.5.5
+devtools::install_github('USGS-R/gsplot', ref='v0.5.5')
+
 # Render multiple reports at one time for the same site:
-wy <- 2014
+wy <- 2015
 
 siteNumber <- '05390500'
 plotNames <- c('ghtable', 'stagehydrograph')
