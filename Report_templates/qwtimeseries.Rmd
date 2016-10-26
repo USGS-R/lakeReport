@@ -45,15 +45,16 @@ chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
 trophic_title <- "TROPHIC STATE INDEX"
 
+# start setting up plot
 par(oma = c(1,4,4,0) + 0.1,
     mar = c(2,2,4,0) + 0.1)
 
 plot_layout <- matrix(1:4, 4, 1)
 layout(plot_layout)
 makeTimeseriesPlot(totalP, totalP_title, date_info, isGreenLake, ylim_buffer = 0.05)
-makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, isGreenLake, ylim_buffer = 1)
+makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, isGreenLake, ylim_buffer = 0.05)
 makeTimeseriesPlot(secchi, secchi_title, date_info, isGreenLake, isSecchi = TRUE, 
-                   axisFlip = TRUE, ylim_buffer = 0.5)
+                   axisFlip = TRUE, ylim_buffer = 0.05)
 makeTimeseriesPlot(trophic, trophic_title, date_info, isGreenLake, isTrophicIndex = TRUE)
 ```
 

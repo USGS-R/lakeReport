@@ -46,7 +46,7 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
 
 makeTimeseriesPlot <- function(parm_data, title, date_info, isGreenLake, isSecchi = FALSE,
                                isTrophicIndex = FALSE, axisFlip = FALSE, ylim_buffer = NULL){
-  
+ 
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
   } else {
@@ -119,7 +119,7 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isGreenLake, isSecch
 }
 
 plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buffer){
-
+  
   # x axis format depends on total length of time for the plot
   timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
   if(timeperiod <= 10){
@@ -132,22 +132,25 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
     x_at <- seq(date_info$firstDate, date_info$lastDate, by="5 years")
     x_n.minor <- 0
   }
-  
+
   #ylim_buffer is NULL for trophic index plot
   if(is.null(ylim_buffer)){
     ymin <- min(parm_data$TSI)
     ymax <- max(parm_data$TSI)
     ymin_buffer <- ymin%%10
     ymax_buffer <- ifelse(ymax%%10 == 0, 0, 10 - ymax%%10)
+    # applying buffer
+    ymin <- ymin - ymin_buffer
+    ymin <- ifelse(ymin < 0, 0, ymin)
+    ymax <- ymax + ymax_buffer
   } else {
-    ymin <- min(parm_data$result_va)
+    ymin <- 0
     ymax <- max(parm_data$result_va)
-    ymin_buffer <- ymax_buffer <- ylim_buffer
+    ymax_buffer <- ylim_buffer
+    
+    ymax <- ymax + ymax_buffer*ymax
+    ymax <- tail(pretty(c(ymin, ymax)), 1)
   }
-  
-  ymin <- ymin - ymin_buffer
-  ymin <- ifelse(ymin < 0, 0, ymin)
-  ymax <- ymax + ymax_buffer
   
   parm_plot <- gsplot() %>% 
     # setting up plot limits
