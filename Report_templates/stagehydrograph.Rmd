@@ -17,15 +17,18 @@ wy_start <- wy_dates$wy_start
 wy_end <- wy_dates$wy_end
 
 extraInfo <- list(...)
-
+isDevilsLake <- siteNumber %in% c('05404500')
 if(!is.null(extraInfo$filePath)){
   stage_data <- read.csv(extraInfo$filePath)
   stagehydrograph <- makeStageHydrograph_file(stage_data, 
                                               extraInfo$dateTime, 
                                               extraInfo$gageHeight)
 } else {
+  startDate <- ifelse(test = isDevilsLake, 
+                      yes = "1936-01-01", 
+                      no = "1800-01-01")
   stage_data <- readNWISdata(service = "dv", sites = siteNumber, 
-                           parameterCd = "00065", startDate = "1800-01-01", 
+                           parameterCd = "00065", startDate = startDate, 
                            endDate = wy_end)
 
   if(nrow(stage_data)!=0){
