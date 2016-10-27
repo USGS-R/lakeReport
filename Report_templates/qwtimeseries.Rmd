@@ -19,7 +19,6 @@ qw_historic <- readNWISqw(siteNumbers = siteNumber,
                           startDate = "1800-01-01", 
                           endDat = wy_end)
 
-isGreenLake <- siteNumber %in% c('434756089020500', '434928088570000')
 isData <- nrow(qw_historic)!=0
 
 ```

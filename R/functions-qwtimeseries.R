@@ -44,7 +44,7 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, date_info, isGreenLake, isSecchi = FALSE,
+makeTimeseriesPlot <- function(parm_data, title, date_info,
                                isTrophicIndex = FALSE, axisFlip = FALSE, ylim_buffer = NULL){
  
   if(nrow(parm_data) == 0){
@@ -61,13 +61,9 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isGreenLake, isSecch
       parm_data <- parm_data %>% 
         mutate(symbolColor = ifelse(is.na(remark_cd), col_uncensored, col_censored))
       
-      if(isGreenLake && isSecchi){
-        usgs <- parm_data %>% filter(sample_depth != 0.1)
-        observer <- parm_data %>% filter(sample_depth == 0.1) 
-      } else {
-        usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER") 
-        observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER") 
-      }
+ 
+      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER") 
+      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER") 
       
       parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
         
