@@ -17,7 +17,7 @@ pcodes <- c("00665", "70953", "32210", "00078", "00098")
 qw_historic <- readNWISqw(siteNumbers = siteNumber, 
                           parameterCd = pcodes,
                           startDate = "1800-01-01", 
-                          endDat = wy_end)
+                          endDate = wy_end)
 
 isData <- nrow(qw_historic)!=0
 

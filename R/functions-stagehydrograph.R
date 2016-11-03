@@ -21,8 +21,9 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
   allDates <- seq(gage_height_all$dateTime[1], tail(gage_height_all$dateTime,1), by="years")
   allYears <- year(allDates)
   
-  stageHydrograph <- gsplot() %>% 
-    lines(gage_height_all$dateTime, gage_height_all$gageHeight) %>% 
+  stageHydrograph <- gsplot(yaxs='r') %>% 
+    points(gage_height_all$dateTime, gage_height_all$gageHeight, 
+           pch=20, col="black") %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
     axis(side=2, n.minor=4) %>%
@@ -40,8 +41,8 @@ makeStageHydrograph_file <- function(stage_data, datetime_colname, gageheight_co
   allYears <- seq(year(gage_height$dateTime[1]), year(tail(gage_height$dateTime,1)))
   allDates <- seq(gage_height$dateTime[1], tail(gage_height$dateTime,1), by="years")
   
-  stageHydrograph <- gsplot() %>% 
-    lines(gage_height$dateTime, gage_height$gageHeight) %>% 
+  stageHydrograph <- gsplot(yaxs='r') %>% 
+    points(gage_height$dateTime, gage_height$gageHeight, pch=20, col="black") %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
     axis(side=2, n.minor=4) %>%
