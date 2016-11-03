@@ -16,8 +16,9 @@ wy_dates <- convertWYtoDate(wy)
 wy_start <- wy_dates$wy_start
 wy_end <- wy_dates$wy_end
 
-extraInfo <- list(...)
 isDevilsLake <- siteNumber %in% c('05404500')
+
+extraInfo <- list(...)
 if(!is.null(extraInfo$filePath)){
   stage_data <- read.csv(extraInfo$filePath)
   stagehydrograph <- makeStageHydrograph_file(stage_data, 
