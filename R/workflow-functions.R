@@ -42,6 +42,10 @@ makeReports <- function(siteNumber, wy, plotNames, output, ...){
 renderLakeReport <- function(plotName, siteNumber, wy, output, ...){
   library(rmarkdown)
   
+  if(plotName == 'stagehydrograph'){
+    gageheight_filepath <- getGageHeightFilePath(siteNumber)
+  }
+  
   output_dir <- file.path(getwd(), wy)
   filename <- paste(plotName, wy, siteNumber, sep="_")
   rmd_file <- paste0("Report_templates/", plotName, '.Rmd') 
@@ -88,4 +92,15 @@ convertWYtoDate <- function(wy){
   s <- as.POSIXct(paste0(wy-1, "-10-01"), tz = "UTC")
   e <- as.POSIXct(paste0(wy, "-09-30"), tz = "UTC")
   return(list(wy_start = s, wy_end = e))
+}
+
+getGageHeightFilePath <- function(siteNumber){
+  library(dplyr)
+  siteDetails <- read.csv("data/plotNames_by_site.csv",
+                          colClasses = c("character", "character",
+                                         rep("logical", 5), "character"),
+                          stringsAsFactors = FALSE)
+  siteDetails_site <- filter(siteDetails, site_no == siteNumber)
+  siteFilePath <- siteDetails_site$gageHeight_files
+  return(siteFilePath)
 }
