@@ -32,11 +32,13 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
   return(stageHydrograph)
 }
 
-makeStageHydrograph_file <- function(stage_data, datetime_colname, gageheight_colname){
+makeStageHydrograph_file <- function(stage_data, siteNumber){
   
-  gage_height <- stage_data %>% 
-    select(dateTime = matches(datetime_colname), gageHeight = matches(gageheight_colname)) %>%
-    na.omit()
+  gage_height <- stage_data %>% na.omit()
+  
+  if(siteNumber == '04082500'){
+    # fill in stuff here
+  }
   
   allYears <- seq(year(gage_height$dateTime[1]), year(tail(gage_height$dateTime,1)))
   allDates <- seq(gage_height$dateTime[1], tail(gage_height$dateTime,1), by="years")
