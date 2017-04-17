@@ -2,27 +2,27 @@
 
 makeStageHydrograph_dataRetrieval <- function(stage_data){
   if("X_OBSERVER_00065_00003" %in% colnames(stage_data)){
-    gage_height_obs <- stage_data %>% 
+    stage_data_obs <- stage_data %>% 
       select(dateTime, X_OBSERVER_00065_00003) %>% 
       rename(gageHeight = X_OBSERVER_00065_00003) %>% 
       filter(!is.na(gageHeight)) 
   } else {
-    gage_height_obs <- NULL
+    stage_data_obs <- NULL
   }
   
-  gage_height_cont <- stage_data %>% 
+  stage_data_cont <- stage_data %>% 
     select(dateTime, ends_with("_00065_00003"), 
            -starts_with("X_OBSERVER")) %>% 
     select(-starts_with('X_TAILWATER')) %>% 
     select(dateTime, gageHeight = ends_with("_00065_00003")) %>% 
     filter(!is.na(gageHeight)) 
-  gage_height_all <- rbind(gage_height_obs, gage_height_cont)
+  stage_data_all <- rbind(stage_data_obs, stage_data_cont)
   
-  allDates <- seq(gage_height_all$dateTime[1], tail(gage_height_all$dateTime,1), by="years")
+  allDates <- seq(stage_data_all$dateTime[1], tail(stage_data_all$dateTime,1), by="years")
   allYears <- year(allDates)
   
   stageHydrograph <- gsplot(yaxs='r') %>% 
-    points(gage_height_all$dateTime, gage_height_all$gageHeight, 
+    points(stage_data_all$dateTime, stage_data_all$gageHeight, 
            pch=20, col="black") %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
@@ -34,17 +34,25 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
 
 makeStageHydrograph_file <- function(stage_data, siteNumber){
   
-  gage_height <- stage_data %>% na.omit()
-  
   if(siteNumber == '04082500'){
-    # fill in stuff here
+    stage_data <- stage_data %>% 
+      mutate(decimalDate = as.numeric(decimalDate)) %>% 
+      mutate(dateTime = date_decimal(decimalDate)) %>%  
+      mutate(dateTime = as.Date(dateTime))
   }
+  #dplyr 0.5.0 filter not working
+  # stage_data <- stage_data %>% filter(!is.na(dateTime))
+  stage_data <- stage_data[which(!is.na(stage_data$dateTime)), ]
   
-  allYears <- seq(year(gage_height$dateTime[1]), year(tail(gage_height$dateTime,1)))
-  allDates <- seq(gage_height$dateTime[1], tail(gage_height$dateTime,1), by="years")
+  startYear <- year(stage_data$dateTime[1])
+  startDate <- as.POSIXct(paste0(startYear, "-01-01"))
+  endYear <- year(tail(stage_data$dateTime,1)) +  1 # plus one to include Sept end of WY
+  endDate <- as.POSIXct(paste0(endYear, "-12-31"))
+  allYears <- seq(startYear, endYear)
+  allDates <- seq(startDate, endDate, by="years")
   
   stageHydrograph <- gsplot(yaxs='r') %>% 
-    points(gage_height$dateTime, gage_height$gageHeight, pch=20, col="black") %>% 
+    points(stage_data$dateTime, stage_data$gageHeight, pch=20, col="black") %>% 
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
     axis(side=2, n.minor=4) %>%
