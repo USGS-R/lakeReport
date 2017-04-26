@@ -32,7 +32,7 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
   return(stageHydrograph)
 }
 
-makeStageHydrograph_file <- function(stage_data, siteNumber){
+makeStageHydrograph_file <- function(stage_data, siteNumber, startDate){
   
   if(siteNumber == '04082500'){
     stage_data <- stage_data %>% 
@@ -43,7 +43,8 @@ makeStageHydrograph_file <- function(stage_data, siteNumber){
   #dplyr 0.5.0 filter not working
   # stage_data <- stage_data %>% filter(!is.na(dateTime))
   stage_data <- stage_data[which(!is.na(stage_data$dateTime)), ]
-  
+  stage_data <- stage_data %>%
+    filter(dateTime>=as.POSIXct(startDate))
   startYear <- year(stage_data$dateTime[1])
   startDate <- as.POSIXct(paste0(startYear, "-01-01"))
   endYear <- year(tail(stage_data$dateTime,1)) +  1 # plus one to include Sept end of WY
