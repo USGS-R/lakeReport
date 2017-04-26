@@ -35,12 +35,12 @@ First, navigate to your R Markdown file (Report_templates >> ghtable.Rmd) and fi
 ![](images/find_RMD_lines.PNG)
 <br>
 
-Debugging R Markdown files requires us to manually execute each line. This means we need to execute everything that comes before our chunk that fails. It also expects that `siteNumber`, `wy`, and any other arguments passed into `makeReports` are already in the environment.
+Debugging R Markdown files requires us to manually execute each line. This means we need to execute everything that comes before our chunk that fails. It also expects that `siteNumber`, `wy`, and any other arguments passed into `makeReports` are already in the environment. For stage hydrograph, you will need to go to `workflow-functions.R` and run `gageheight_filepath <- getGageHeightFilePath(siteNumber)` to create the gageheight_filepath variable.
 
 ![](images/environment.PNG)
 <br>
 
-You should be able to highlight and click CTRL + ENTR for each code chunk preceding the error. Note: for the `source` call that loads the report-specific functions, remove the "../" and then run. Or manually navigate to that file (R >> functions-ghtable.R) and click "source".
+You should be able to highlight and click CTRL + ENTR for each code chunk preceding the error. Note: for the `source` call that loads the report-specific functions, remove the "../" and then run. Or manually navigate to that file (R >> functions-ghtable.R) and click "source". For stage hydrographs, you won't be able to execute `extraInfo <- list(...)` because the dots refer to things only passed in through `makeReports` (i.e. gageheight_filepath which we manually created). Just skip that line.
 
 ![](images/remove_dots.PNG)
 <br>
