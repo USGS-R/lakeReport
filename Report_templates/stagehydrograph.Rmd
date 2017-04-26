@@ -19,8 +19,8 @@ wy_end <- wy_dates$wy_end
 
 isDevilsLake <- siteNumber %in% c('05404500')
 startDate <- ifelse(test = isDevilsLake, 
-                      yes = as.Date("1936-01-01"), 
-                      no = as.Date("1800-01-01"))
+                      yes = "1936-01-01", 
+                      no = "1800-01-01")
 
 extraInfo <- list(...)
 if(nchar(gageheight_filepath) > 0){
