@@ -90,7 +90,9 @@ makeTimeseriesPlot <- function(parm_data, title, date_info,
       olig_pos <- median(c(min(parm_data$TSI), 40))
       eutr_pos <- median(c(50, max(parm_data$TSI)))
       
-      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info, ylim_buffer) %>% 
+      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info, ylim_buffer)
+      
+      parm_plot <- parm_plot %>% 
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
@@ -105,6 +107,10 @@ makeTimeseriesPlot <- function(parm_data, title, date_info,
         text(x = min(parm_data$sample_dt), y = c(olig_pos, 45, eutr_pos), 
              cex = 0.8, pos = 4,
              labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
+        rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
+             ybottom = c(min(parm_data$TSI), 40, 50), ytop = c(40, 50, max(parm_data$TSI)),
+             legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
+             col = c("blue", "orange", "green"), border = NA, where = "first")
         
         # adding the legend (no box around it)
         legend(bty = 'n')
