@@ -44,8 +44,8 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, date_info,
-                               isTrophicIndex = FALSE, axisFlip = FALSE, ylim_buffer = NULL){
+makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FALSE, 
+                               axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL){
  
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -53,34 +53,18 @@ makeTimeseriesPlot <- function(parm_data, title, date_info,
   
     if(!isTrophicIndex){
       
-      col_censored <- "red"
-      col_uncensored <- "black"
-      pch_usgs <- 18
-      pch_observer <- 1
-      
-      parm_data <- parm_data %>% 
-        mutate(symbolColor = ifelse(is.na(remark_cd), col_uncensored, col_censored))
-      
- 
-      usgs <- parm_data %>% filter(coll_ent_cd != "OBSERVER") 
-      observer <- parm_data %>% filter(coll_ent_cd == "OBSERVER") 
+      usgs_cen <- parm_data %>% filter(coll_ent_cd != "OBSERVER") %>% filter(!is.na(remark_cd))
+      usgs_uncen <- parm_data %>% filter(coll_ent_cd != "OBSERVER") %>% filter(is.na(remark_cd))
+      observer_cen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(!is.na(remark_cd))
+      observer_uncen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(is.na(remark_cd))
       
       parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
         
         # adding data to plot
-        points(x = usgs$sample_dt, y = usgs$result_va, 
-               pch = pch_usgs, col = usgs$symbolColor) %>% 
-        points(x = observer$sample_dt, y = observer$result_va, 
-               pch = pch_observer, col = observer$symbolColor) 
-      
-      # only include legend on the top plot
-      if(length(grep("PHOSPHORUS", title)) > 0){ 
-        parm_plot <- parm_plot %>%
-          legend(pch = c(pch_usgs,pch_usgs,pch_observer,pch_observer), 
-                 col = rep(c(col_uncensored, col_censored),2), 
-                 legend = c("USGS - Uncensored", "USGS - Censored", 
-                            "Observer - Uncensored", "Observer - Censored"))
-      }
+        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", legend.name = "USGS - Censored") %>% 
+        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", legend.name = "USGS - Unensored") %>% 
+        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", legend.name = "Observer - Censored") %>%
+        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", legend.name = "Observer - Unensored") 
       
     } else {
       totalP <- filter(parm_data, Timeseries == 'totalP')
@@ -112,8 +96,13 @@ makeTimeseriesPlot <- function(parm_data, title, date_info,
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
              col = c("blue", "orange", "green"), border = NA, where = "first")
         
-        # adding the legend (no box around it)
-        legend(bty = 'n')
+      # adding the legend (no box around it)
+      # merging this plot legend with a legend representing the first three time series
+      if(!is.null(addLegend)){
+        parm_plot$legend$legend.auto <- 
+          mapply(c, addLegend$legend.auto, parm_plot$legend$legend.auto, SIMPLIFY = FALSE)
+        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=4)
+      }
       
     }
   }
