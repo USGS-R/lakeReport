@@ -145,10 +145,10 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
   
   parm_plot <- gsplot() %>% 
     # setting up plot limits
-    points(NA, NA, 
-           ylab = title, 
+    points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
+    title(ylab=title, line=2) %>% 
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
