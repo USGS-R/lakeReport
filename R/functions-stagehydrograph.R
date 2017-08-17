@@ -27,7 +27,7 @@ makeStageHydrograph_dataRetrieval <- function(stage_data){
     axis(side=1, at=allDates, labels=allYears) %>% 
     axis(side=3, at=allDates, labels=FALSE) %>%
     axis(side=2, n.minor=4) %>%
-    title(ylab = "GAGE HEIGHT, IN FEET")
+    title(ylab = "GAGE HEIGHT, IN FEET", line=2)
   
   return(stageHydrograph)
 }
