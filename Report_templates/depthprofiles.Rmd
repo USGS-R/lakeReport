@@ -29,6 +29,12 @@ qw_nwis <- readNWISqw(siteNumbers = siteNumber,
                       startDate = wy_start, 
                       endDate = wy_end)
 
+min_date <- toupper(format(min(qw_nwis$sample_dt), "%B %d, %Y"))
+max_date <- toupper(format(max(qw_nwis$sample_dt), "%B %d, %Y"))
+lake_nm <- attr(qw_nwis, "siteInfo")$station_nm
+plot_main_title <- paste("##", siteNumber, lake_nm) # the `#` make it larger/bold
+plot_sub_title <- paste("LAKE-DEPTH PROFILES,", min_date, "TO", max_date)
+
 if(nrow(qw_nwis)!=0){
   prof_data <- filterLakeDepthProfileData(qw_nwis)
 } else {
@@ -85,7 +91,15 @@ if(num_2xN_plots != 0){
   plot_setup <- matrix(1:(N*2), 2, N)
   d <- 1
   for(p in seq(num_2xN_plots)){
-    if(p > 1){cat("\n\\newpage\n")}
+    if(p > 1){
+      cat("\n\\newpage\n")
+      cat("\n\n")
+    }
+    cat(plot_main_title)
+    cat("\n\n")
+    cat(plot_sub_title)
+    cat("\n\n")
+    
     dts <- dates_uniq[d:(p*N)]
   
     layout(plot_setup)
@@ -130,6 +144,11 @@ par(oma = c(5,4,4,0) + 0.1,
 dts <- tail(dates_uniq, num_extra_plots)
 if(length(dts) > 0){
   cat("\n\\newpage\n")
+  cat("\n\n")
+  cat(plot_main_title)
+  cat("\n\n")
+  cat(plot_sub_title)
+  cat("\n\n")
   
   num_plots_on_page <- ifelse(isEven, 4, 5)
   num_before_after <- (num_plots_on_page - num_extra_plots)/2 #number of blank plots to center
