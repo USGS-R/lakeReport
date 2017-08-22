@@ -80,11 +80,11 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
-              lty = 2, legend.name = "Total Phosphorus") %>% 
+              lty = 2, col = "red", legend.name = "Total Phosphorus") %>% 
         lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
-              lty = 1, legend.name = "Chlorophyll a") %>%
+              lty = 1, col = "forestgreen", legend.name = "Chlorophyll a") %>%
         lines(x = secchi$sample_dt, y=secchi$TSI, 
-              lty = 3, legend.name = "Secchi depth") %>%
+              lty = 3, col = "blue", legend.name = "Secchi depth") %>%
         
         # defining trophic zones
         abline(h = c(40,50), lty = 5) %>% 
@@ -94,7 +94,7 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
              ybottom = c(min(parm_data$TSI), 40, 50), ytop = c(40, 50, max(parm_data$TSI)),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
-             col = c("blue", "orange", "green"), border = NA, where = "first")
+             col = c("lightskyblue", "tan1", "darkolivegreen3"), border = NA, where = "first")
         
       # adding the legend (no box around it)
       # merging this plot legend with a legend representing the first three time series
@@ -148,7 +148,7 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
-    title(ylab=title, line=2) %>% 
+    title(ylab=title, line=3) %>% 
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
