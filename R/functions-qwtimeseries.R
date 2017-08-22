@@ -92,7 +92,7 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
              cex = 0.8, pos = 4,
              labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
-             ybottom = c(min(parm_data$TSI), 40, 50), ytop = c(40, 50, max(parm_data$TSI)),
+             ybottom = c(0, 40, 50), ytop = c(40, 50, 100),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
              col = c("lightskyblue", "tan1", "darkolivegreen3"), border = NA, where = "first")
         
