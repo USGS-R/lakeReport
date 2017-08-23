@@ -88,9 +88,6 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
         
         # defining trophic zones
         abline(h = c(40,50), lty = 5) %>% 
-        text(x = min(parm_data$sample_dt), y = c(olig_pos, 45, eutr_pos), 
-             cex = 0.8, pos = 4,
-             labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
              ybottom = c(0, 40, 50), ytop = c(40, 50, 100),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
