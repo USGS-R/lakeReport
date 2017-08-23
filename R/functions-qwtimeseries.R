@@ -77,6 +77,9 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
       parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info, ylim_buffer)
       
       parm_plot <- parm_plot %>% 
+        
+        # dummy point call for blank legend entry
+        points(x = NA, y = NA, col = 'white', legend.name = "") %>%
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
@@ -87,7 +90,6 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
               lty = 3, col = "blue", legend.name = "Secchi depth") %>%
         
         # defining trophic zones
-        abline(h = c(40,50), lty = 5) %>% 
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
              ybottom = c(0, 40, 50), ytop = c(40, 50, 100),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
@@ -98,7 +100,7 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
       if(!is.null(addLegend)){
         parm_plot$legend$legend.auto <- 
           mapply(c, addLegend$legend.auto, parm_plot$legend$legend.auto, SIMPLIFY = FALSE)
-        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=4)
+        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=3, inset = -0.4)
       }
       
     }
