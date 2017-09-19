@@ -159,10 +159,10 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
     mtext(text = plot_sub_title, line = 0.5, cex = 0.7)%>%
     
     # formatting axes
-    axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
-    axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at)) %>% 
-    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE)
+    axis(side = 2, reverse = axisFlip, n.minor = y_n.minor, tcl.minor = 0.1) %>% 
+    axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE, tcl.minor = 0.1) %>%  
+    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at), tcl.minor = 0.1) %>% 
+    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE, tcl.minor = 0.1)
   
   return(parm_plot)
 }
