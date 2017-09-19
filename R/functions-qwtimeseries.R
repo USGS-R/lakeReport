@@ -63,14 +63,14 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
                              plot_main_title, plot_sub_title) %>% 
         
         # adding data to plot
-        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", 
+        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", cex = 2, 
                legend.name = "USGS - Censored") %>% 
-        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", 
-               legend.name = "USGS - Unensored") %>% 
-        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", 
+        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", cex = 2,
+               legend.name = "USGS - Uncensored") %>% 
+        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", cex = 2,
                legend.name = "Observer - Censored") %>%
-        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", 
-               legend.name = "Observer - Unensored") 
+        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", cex = 2,
+               legend.name = "Observer - Uncensored") 
       
     } else {
       totalP <- filter(parm_data, Timeseries == 'totalP')
