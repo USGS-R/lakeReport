@@ -90,11 +90,11 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
-              lty = 2, col = "red", legend.name = "Total Phosphorus") %>% 
+              lty = 2, col = "red", lwd = 2, legend.name = "Total Phosphorus") %>% 
         lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
-              lty = 1, col = "forestgreen", legend.name = "Chlorophyll a") %>%
+              lty = 1, col = "forestgreen", lwd = 2, legend.name = "Chlorophyll a") %>%
         lines(x = secchi$sample_dt, y=secchi$TSI, 
-              lty = 3, col = "blue", legend.name = "Secchi depth") %>%
+              lty = 3, col = "blue", lwd = 2, legend.name = "Secchi depth") %>%
         
         # defining trophic zones
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
@@ -155,8 +155,8 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
-    title(ylab=y_axis_name, line=3, main = plot_main_title) %>% 
-    mtext(text = plot_sub_title, line = 0.5, cex = 0.7)%>%
+    title(ylab=y_axis_name, line=4, , cex = 2, main = plot_main_title) %>% 
+    mtext(text = plot_sub_title, line = 0.8, cex = 1)%>%
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor, tcl.minor = 0.1) %>% 
