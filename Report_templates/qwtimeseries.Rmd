@@ -46,8 +46,7 @@ totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
 chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
 trophic_title <- "TROPHIC STATE INDEX"
-top_margin <- 0
-bottom_margin <- 2
+
 
 # start setting up plot
 

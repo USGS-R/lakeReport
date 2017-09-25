@@ -61,7 +61,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       observer_uncen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(is.na(remark_cd))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 1, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title) %>% 
+                             plot_main_title, plot_sub_title, top_margin, bottom_margin) %>% 
         
         # adding data to plot
         points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", cex = 2, 
