@@ -46,7 +46,8 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
 
 makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex = FALSE, 
                                axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL, 
-                               plot_main_title = NULL, plot_sub_title = NULL){
+                               plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, 
+                               bottom_margin = 2){
  
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -81,7 +82,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       eutr_pos <- median(c(50, max(parm_data$TSI)))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 4, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title)
+                             plot_main_title, plot_sub_title, top_margin, bottom_margin)
       
       parm_plot <- parm_plot %>% 
         
@@ -116,7 +117,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
 }
 
 plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, ylim_buffer, 
-                      plot_main_title = NULL, plot_sub_title = NULL){
+                      plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, bottom_margin = 2){
   
   # x axis format depends on total length of time for the plot
   timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
@@ -149,8 +150,8 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
     ymax <- ymax + ymax_buffer*ymax
     ymax <- tail(pretty(c(ymin, ymax)), 1)
   }
-  
-  parm_plot <- gsplot() %>% 
+ 
+  parm_plot <- gsplot(mar = c(bottom_margin,7,top_margin,0)) %>% 
     # setting up plot limits
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
