@@ -39,6 +39,9 @@ lastDate <- as.Date(format(wy_dates$wy_end, "%Y-12-31"))
 yrs <- seq(firstDate, lastDate, by = "years")
 date_info <- list(firstDate = firstDate, lastDate = lastDate, yrs = yrs)
 
+lake_nm <- attr(qw_historic, "siteInfo")$station_nm
+plot_main_title <- paste(siteNumber, lake_nm)
+plot_sub_title <- "Surface total phosphorus, chlorophyll a concentrations, Secchi depths, and TSI data"
 totalP_title <- "TOTAL PHOSPHORUS CONCENTRATION\nIN MILLIGRAMS PER LITER"
 chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
@@ -50,7 +53,7 @@ par(oma = c(1,4,4,0) + 0.1,
 
 plot_layout <- matrix(1:4, 4, 1)
 
-plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05)
+plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05, plot_main_title = plot_main_title, plot_sub_title = plot_sub_title)
 plot_chloro <- makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, ylim_buffer = 0.05)
 plot_secchi <- makeTimeseriesPlot(secchi, secchi_title, date_info,
                    axisFlip = TRUE, ylim_buffer = 0.05)

@@ -44,8 +44,9 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
   return(TSI)
 }
 
-makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FALSE, 
-                               axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL){
+makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex = FALSE, 
+                               axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL, 
+                               plot_main_title = NULL, plot_sub_title = NULL){
  
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -58,13 +59,18 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
       observer_cen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(!is.na(remark_cd))
       observer_uncen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(is.na(remark_cd))
       
-      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 1, date_info, ylim_buffer) %>% 
+      parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 1, date_info, ylim_buffer, 
+                             plot_main_title, plot_sub_title) %>% 
         
         # adding data to plot
-        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", legend.name = "USGS - Censored") %>% 
-        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", legend.name = "USGS - Unensored") %>% 
-        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", legend.name = "Observer - Censored") %>%
-        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", legend.name = "Observer - Unensored") 
+        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", 
+               legend.name = "USGS - Censored") %>% 
+        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", 
+               legend.name = "USGS - Unensored") %>% 
+        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", 
+               legend.name = "Observer - Censored") %>%
+        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", 
+               legend.name = "Observer - Unensored") 
       
     } else {
       totalP <- filter(parm_data, Timeseries == 'totalP')
@@ -74,34 +80,34 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
       olig_pos <- median(c(min(parm_data$TSI), 40))
       eutr_pos <- median(c(50, max(parm_data$TSI)))
       
-      parm_plot <- plotSetup(parm_data, title, axisFlip, y_n.minor = 4, date_info, ylim_buffer)
+      parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 4, date_info, ylim_buffer, 
+                             plot_main_title, plot_sub_title)
       
       parm_plot <- parm_plot %>% 
+        
+        # dummy point call for blank legend entry
+        points(x = NA, y = NA, col = 'white', legend.name = "") %>%
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
-              lty = 2, legend.name = "Total Phosphorus") %>% 
+              lty = 2, col = "red", legend.name = "Total Phosphorus") %>% 
         lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
-              lty = 1, legend.name = "Chlorophyll a") %>%
+              lty = 1, col = "forestgreen", legend.name = "Chlorophyll a") %>%
         lines(x = secchi$sample_dt, y=secchi$TSI, 
-              lty = 3, legend.name = "Secchi depth") %>%
+              lty = 3, col = "blue", legend.name = "Secchi depth") %>%
         
         # defining trophic zones
-        abline(h = c(40,50), lty = 5) %>% 
-        text(x = min(parm_data$sample_dt), y = c(olig_pos, 45, eutr_pos), 
-             cex = 0.8, pos = 4,
-             labels = c("Oligotrophic", "Mesotrophic", "Eutrophic")) %>% 
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
-             ybottom = c(min(parm_data$TSI), 40, 50), ytop = c(40, 50, max(parm_data$TSI)),
+             ybottom = c(0, 40, 50), ytop = c(40, 50, 100),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
-             col = c("blue", "orange", "green"), border = NA, where = "first")
+             col = c("lightskyblue", "tan1", "darkolivegreen3"), border = NA, where = "first")
         
       # adding the legend (no box around it)
       # merging this plot legend with a legend representing the first three time series
       if(!is.null(addLegend)){
         parm_plot$legend$legend.auto <- 
           mapply(c, addLegend$legend.auto, parm_plot$legend$legend.auto, SIMPLIFY = FALSE)
-        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=4)
+        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=3, inset = -0.4)
       }
       
     }
@@ -109,7 +115,8 @@ makeTimeseriesPlot <- function(parm_data, title, date_info, isTrophicIndex = FAL
   return(parm_plot)
 }
 
-plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buffer){
+plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, ylim_buffer, 
+                      plot_main_title = NULL, plot_sub_title = NULL){
   
   # x axis format depends on total length of time for the plot
   timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
@@ -148,7 +155,8 @@ plotSetup <- function(parm_data, title, axisFlip, y_n.minor, date_info, ylim_buf
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
-    title(ylab=title, line=2) %>% 
+    title(ylab=y_axis_name, line=3, main = plot_main_title) %>% 
+    mtext(text = plot_sub_title, line = 0.5, cex = 0.7)%>%
     
     # formatting axes
     axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
