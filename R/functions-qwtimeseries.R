@@ -46,8 +46,7 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
 
 makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex = FALSE, 
                                axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL, 
-                               plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, 
-                               bottom_margin = 2){
+                               top_margin = 0, bottom_margin = 2){
  
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -61,7 +60,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       observer_uncen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(is.na(remark_cd))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 1, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title, top_margin, bottom_margin) %>% 
+                             top_margin, bottom_margin) %>% 
         
         # adding data to plot
         points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", cex = 2, 
@@ -82,7 +81,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       eutr_pos <- median(c(50, max(parm_data$TSI)))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 4, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title, top_margin, bottom_margin)
+                             top_margin, bottom_margin)
       
       parm_plot <- parm_plot %>% 
         
@@ -102,22 +101,19 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
              ybottom = c(0, 40, 50), ytop = c(40, 50, 100),
              legend.name = c("Oligotrophic", "Mesotrophic", "Eutrophic"),
              col = c("lightskyblue", "tan1", "darkolivegreen3"), border = NA, where = "first")
-        
-      # adding the legend (no box around it)
-      # merging this plot legend with a legend representing the first three time series
+      
+      # combining secchi legend w/ tsi legend
       if(!is.null(addLegend)){
         parm_plot$legend$legend.auto <- 
           mapply(c, addLegend$legend.auto, parm_plot$legend$legend.auto, SIMPLIFY = FALSE)
-        parm_plot <- parm_plot %>% legend("below", bty = 'n', ncol=3, inset = -0.4)
       }
-      
     }
   }
   return(parm_plot)
 }
 
 plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, ylim_buffer, 
-                      plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, bottom_margin = 2){
+                      top_margin = 0, bottom_margin = 2, plot_main_title = NULL, plot_sub_title = NULL){
   
   # x axis format depends on total length of time for the plot
   timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
@@ -168,3 +164,26 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
   return(parm_plot)
 }
 
+makeTitlePlot <- function(main, subtitle){
+  plot_main <- gsplot(mar = c(0,0,0,0), frame.plot = FALSE) %>% 
+    # setting up plot limits
+    points(NA, NA, ylim = c(0,0), yaxt = "n", xaxt = "n") %>% 
+    title(line=-4, cex = 5, main = main) %>% 
+    mtext(text = subtitle, line = -4.8, cex = 1)
+  
+  return(plot_main)
+}
+
+makeLegendPlot <- function(legend){
+  plot_skeleton <- gsplot(mar = c(0,0,0,0), frame.plot = FALSE) %>% 
+    # setting up plot limits
+    points(NA, NA, ylim = c(0,0), yaxt = "n", xaxt = "n")
+  
+  # adding the legend (no box around it)
+  if(!is.null(legend)){
+    plot_skeleton$legend$legend.auto <- legend$legend.auto
+    plot_legend <- plot_skeleton %>% legend("center", bty = 'n', ncol=3)
+  }
+  
+  return(plot_legend)
+}

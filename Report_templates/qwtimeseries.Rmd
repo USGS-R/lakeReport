@@ -8,7 +8,7 @@ library(gsplot)
 source("../R/functions-qwtimeseries.R")
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.height = 14, fig.width=11} 
+```{r echo=FALSE, warning=FALSE, message=FALSE} 
 wy_dates <- convertWYtoDate(wy)
 wy_end <- wy_dates$wy_end
 
@@ -51,21 +51,24 @@ trophic_title <- "TROPHIC STATE INDEX"
 # start setting up plot
 
 
-plot_layout <- matrix(1:4, 4, 1)
-
-plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05, plot_main_title = plot_main_title, plot_sub_title = plot_sub_title, top_margin = 8)
+plot_layout <- matrix(c(1,2,2,3,3,4,4,5,5,6), 10, 1)
+plot_title <- makeTitlePlot(main = plot_main_title, subtitle = plot_sub_title)
+plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05, top_margin = 0)
 plot_chloro <- makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, ylim_buffer = 0.05)
 plot_secchi <- makeTimeseriesPlot(secchi, secchi_title, date_info,
                    axisFlip = TRUE, ylim_buffer = 0.05)
 plot_tsi <- makeTimeseriesPlot(trophic, trophic_title, date_info, isTrophicIndex = TRUE,
-                               addLegend = plot_secchi$legend, bottom_margin = 8)
+                               addLegend = plot_secchi$legend, bottom_margin = 0)
+plot_legend <- makeLegendPlot(plot_tsi$legend)
 
 layout(plot_layout)
 par(oma = c(0,0,0,0))
+plot_title
 plot_p
 plot_chloro
 plot_secchi
 plot_tsi
+plot_legend
 
 ```
 
