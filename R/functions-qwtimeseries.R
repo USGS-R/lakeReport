@@ -152,7 +152,7 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
-    title(ylab=y_axis_name, line=4, , cex = 2, main = plot_main_title) %>% 
+    title(ylab=y_axis_name, line=4, , cex = 4, main = plot_main_title) %>% 
     mtext(text = plot_sub_title, line = 0.8, cex = 1)%>%
     
     # formatting axes
@@ -168,8 +168,8 @@ makeTitlePlot <- function(main, subtitle){
   plot_main <- gsplot(mar = c(0,0,0,0), frame.plot = FALSE) %>% 
     # setting up plot limits
     points(NA, NA, ylim = c(0,0), yaxt = "n", xaxt = "n") %>% 
-    title(line=-4, cex = 5, main = main) %>% 
-    mtext(text = subtitle, line = -4.8, cex = 1)
+    title(line=-3, cex.main = 2, main = main) %>% 
+    mtext(text = subtitle, line = -5.5, cex.sub = 1.5)
   
   return(plot_main)
 }
