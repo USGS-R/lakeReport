@@ -90,14 +90,7 @@ if(num_2xN_plots != 0){
   plot_setup <- matrix(1:(N*2), 2, N)
   d <- 1
   for(p in seq(num_2xN_plots)){
-    if(p > 1){
-      cat("\n\\newpage\n")
-      cat("\n\n")
-    }
-    cat(plot_main_title)
-    cat("\n\n")
-    cat(plot_sub_title)
-    cat("\n\n")
+    if(p > 1){cat("\n\\newpage\n")}
     
     dts <- dates_uniq[d:(p*N)]
   
@@ -146,11 +139,6 @@ par(oma = c(5,4,4,0) + 0.1,
 dts <- tail(dates_uniq, num_extra_plots)
 if(length(dts) > 0){
   cat("\n\\newpage\n")
-  cat("\n\n")
-  cat(plot_main_title)
-  cat("\n\n")
-  cat(plot_sub_title)
-  cat("\n\n")
   
   num_plots_on_page <- ifelse(isEven, 4, 5)
   num_before_after <- (num_plots_on_page - num_extra_plots)/2 #number of blank plots to center
