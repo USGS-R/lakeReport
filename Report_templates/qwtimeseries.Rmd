@@ -1,3 +1,8 @@
+---
+output: 
+  word_document:
+    reference_docx: qwtimeseries_style.docx
+---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 library(dataRetrieval)
