@@ -101,13 +101,16 @@ if(num_2xN_plots != 0){
     
     dts <- dates_uniq[d:(p*N)]
   
+    gs.dummy <- gsplot() # needed to have layouts work, see gsplot github issue #404
     layout(plot_setup)
     for(t in seq_along(dts)){
       left_logic <- t == 1 #is it the farthest left plot
-      print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+      print(depthProfilePlot(gs.dummy, 
+                             side1 = h2otemp, side3 = DO, 
                              filter_date = dts[t], top = TRUE, 
                              left = left_logic, xranges = plotRanges))
-      print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+      print(depthProfilePlot(gs.dummy, 
+                             side1 = specifcond, side3 = PH, 
                              filter_date = dts[t], top = FALSE, 
                              left = left_logic, xranges = plotRanges))
     }
@@ -159,6 +162,7 @@ if(length(dts) > 0){
     ylabel_line <- 2
   }
   
+  gs.dummy <- gsplot() # needed to have layouts work, see gsplot github issue #404
   plot_setup <- matrix(1:(2*num_plots_on_page), 2, num_plots_on_page)
   layout(plot_setup)
 
@@ -169,10 +173,12 @@ if(length(dts) > 0){
   
   for(t in seq_along(dts)){
     left_logic <- t == 1 #is it the farthest left plot
-    print(depthProfilePlot(side1 = h2otemp, side3 = DO, 
+    print(depthProfilePlot(gs.dummy, 
+                           side1 = h2otemp, side3 = DO, 
                            filter_date = dts[t], top = TRUE, 
                            left=left_logic, xranges=plotRanges))
-    print(depthProfilePlot(side1 = specifcond, side3 = PH, 
+    print(depthProfilePlot(gs.dummy, 
+                           side1 = specifcond, side3 = PH, 
                            filter_date = dts[t], top = FALSE, 
                            left = left_logic, xranges = plotRanges))
   }

@@ -50,7 +50,7 @@ filterByDate <- function(df, filter_date){
   return(list(x=df[['result_va']], y=df[['depth']]))
 }
 
-depthProfilePlot <- function(side1, side3, filter_date, 
+depthProfilePlot <- function(gs, side1, side3, filter_date, 
                              top, left, xranges){
   # find range for all data
   all_y <- c(side1[['depth']], side3[['depth']])
@@ -99,7 +99,7 @@ depthProfilePlot <- function(side1, side3, filter_date,
     mainTitle <- ""
   }
   
-  depthplot <- gsplot() %>% 
+  depthplot <- gs %>% 
     # water temp or specific conductance
     lines(side1_list$x, side1_list$y, lty=3, lwd=1.5, 
           ylim=c(0, ceiling_mult_yseq),
