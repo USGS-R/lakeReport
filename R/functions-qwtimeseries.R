@@ -46,7 +46,8 @@ calcTrophicIndex <- function(totalP, chlorophyll, secchi){
 
 makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex = FALSE, 
                                axisFlip = FALSE, ylim_buffer = NULL, addLegend = NULL, 
-                               plot_main_title = NULL, plot_sub_title = NULL){
+                               plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, 
+                               bottom_margin = 2){
  
   if(nrow(parm_data) == 0){
     parm_plot <- 'No data available'
@@ -60,17 +61,17 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       observer_uncen <- parm_data %>% filter(coll_ent_cd == "OBSERVER") %>% filter(is.na(remark_cd))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 1, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title) %>% 
+                             plot_main_title, plot_sub_title, top_margin, bottom_margin) %>% 
         
         # adding data to plot
-        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", 
+        points(x = usgs_cen$sample_dt, y = usgs_cen$result_va, pch = 18, col = "red", cex = 2, 
                legend.name = "USGS - Censored") %>% 
-        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", 
-               legend.name = "USGS - Unensored") %>% 
-        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", 
+        points(x = usgs_uncen$sample_dt, y = usgs_uncen$result_va, pch = 18, col = "black", cex = 2,
+               legend.name = "USGS - Uncensored") %>% 
+        points(x = observer_cen$sample_dt, y = observer_cen$result_va, pch = 1, col = "red", cex = 2,
                legend.name = "Observer - Censored") %>%
-        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", 
-               legend.name = "Observer - Unensored") 
+        points(x = observer_uncen$sample_dt, y = observer_uncen$result_va, pch = 1, col = "black", cex = 2,
+               legend.name = "Observer - Uncensored") 
       
     } else {
       totalP <- filter(parm_data, Timeseries == 'totalP')
@@ -81,7 +82,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
       eutr_pos <- median(c(50, max(parm_data$TSI)))
       
       parm_plot <- plotSetup(parm_data, y_axis_name, axisFlip, y_n.minor = 4, date_info, ylim_buffer, 
-                             plot_main_title, plot_sub_title)
+                             plot_main_title, plot_sub_title, top_margin, bottom_margin)
       
       parm_plot <- parm_plot %>% 
         
@@ -90,11 +91,11 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
   
         # adding data to the plot
         lines(x = totalP$sample_dt, y = totalP$TSI, 
-              lty = 2, col = "red", legend.name = "Total Phosphorus") %>% 
+              lty = 2, col = "red", lwd = 2, legend.name = "Total Phosphorus") %>% 
         lines(x = chlorophyll$sample_dt, y = chlorophyll$TSI, 
-              lty = 1, col = "forestgreen", legend.name = "Chlorophyll a") %>%
+              lty = 1, col = "forestgreen", lwd = 2, legend.name = "Chlorophyll a") %>%
         lines(x = secchi$sample_dt, y=secchi$TSI, 
-              lty = 3, col = "blue", legend.name = "Secchi depth") %>%
+              lty = 3, col = "blue", lwd = 2, legend.name = "Secchi depth") %>%
         
         # defining trophic zones
         rect(xleft = xlim(parm_plot, side = 1)[1], xright = xlim(parm_plot, side = 1)[2],
@@ -116,7 +117,7 @@ makeTimeseriesPlot <- function(parm_data, y_axis_name, date_info, isTrophicIndex
 }
 
 plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, ylim_buffer, 
-                      plot_main_title = NULL, plot_sub_title = NULL){
+                      plot_main_title = NULL, plot_sub_title = NULL, top_margin = 0, bottom_margin = 2){
   
   # x axis format depends on total length of time for the plot
   timeperiod <- year(date_info$lastDate) - year(date_info$firstDate)
@@ -149,20 +150,20 @@ plotSetup <- function(parm_data, y_axis_name, axisFlip, y_n.minor, date_info, yl
     ymax <- ymax + ymax_buffer*ymax
     ymax <- tail(pretty(c(ymin, ymax)), 1)
   }
-  
-  parm_plot <- gsplot() %>% 
+ 
+  parm_plot <- gsplot(mar = c(bottom_margin,7,top_margin,0)) %>% 
     # setting up plot limits
     points(NA, NA,  
            xlim = c(date_info$firstDate, date_info$lastDate),
            ylim = c(ymin, ymax)) %>% 
-    title(ylab=y_axis_name, line=3, main = plot_main_title) %>% 
-    mtext(text = plot_sub_title, line = 0.5, cex = 0.7)%>%
+    title(ylab=y_axis_name, line=4, , cex = 2, main = plot_main_title) %>% 
+    mtext(text = plot_sub_title, line = 0.8, cex = 1)%>%
     
     # formatting axes
-    axis(side = 2, reverse = axisFlip, n.minor = y_n.minor) %>% 
-    axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE) %>%  
-    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at)) %>% 
-    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE)
+    axis(side = 2, reverse = axisFlip, n.minor = y_n.minor, tcl.minor = 0.1) %>% 
+    axis(side = 4, reverse = axisFlip, n.minor = y_n.minor, labels = FALSE, tcl.minor = 0.1) %>%  
+    axis(side = 1, at = x_at, n.minor = x_n.minor, labels = year(x_at), tcl.minor = 0.1) %>% 
+    axis(side = 3, at = x_at, n.minor = x_n.minor, labels = FALSE, tcl.minor = 0.1)
   
   return(parm_plot)
 }

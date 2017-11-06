@@ -47,20 +47,21 @@ chlorophyll_title <- "CHLOROPHYLL CONCENTRATION\nIN MICROGRAMS PER LITER"
 secchi_title <- "SECCHI DEPTH, IN METERS"
 trophic_title <- "TROPHIC STATE INDEX"
 
+
 # start setting up plot
-par(oma = c(1,4,4,0) + 0.1,
-    mar = c(2,2,4,0) + 0.1)
+
 
 plot_layout <- matrix(1:4, 4, 1)
 
-plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05, plot_main_title = plot_main_title, plot_sub_title = plot_sub_title)
+plot_p <- makeTimeseriesPlot(totalP, totalP_title, date_info, ylim_buffer = 0.05, plot_main_title = plot_main_title, plot_sub_title = plot_sub_title, top_margin = 8)
 plot_chloro <- makeTimeseriesPlot(chlorophyll, chlorophyll_title, date_info, ylim_buffer = 0.05)
 plot_secchi <- makeTimeseriesPlot(secchi, secchi_title, date_info,
                    axisFlip = TRUE, ylim_buffer = 0.05)
 plot_tsi <- makeTimeseriesPlot(trophic, trophic_title, date_info, isTrophicIndex = TRUE,
-                               addLegend = plot_secchi$legend)
+                               addLegend = plot_secchi$legend, bottom_margin = 8)
 
 layout(plot_layout)
+par(oma = c(0,0,0,0))
 plot_p
 plot_chloro
 plot_secchi
