@@ -32,7 +32,7 @@ qw_nwis <- readNWISqw(siteNumbers = siteNumber,
 min_date <- toupper(format(min(qw_nwis$sample_dt), "%B %d, %Y"))
 max_date <- toupper(format(max(qw_nwis$sample_dt), "%B %d, %Y"))
 lake_nm <- attr(qw_nwis, "siteInfo")$station_nm
-plot_main_title <- paste("##", siteNumber, lake_nm) # the `#` make it larger/bold
+plot_main_title <- paste(siteNumber, lake_nm)
 plot_sub_title <- paste("LAKE-DEPTH PROFILES,", min_date, "TO", max_date)
 
 if(nrow(qw_nwis)!=0){
@@ -82,7 +82,7 @@ isEven <- num_extra_plots%%2 == 0
 ```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height = 6.5}
 
 #set plot options for margins (in order to fit text)
-par(oma = c(5,4,4,0) + 0.1,
+par(oma = c(0,0,15,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
 #2x5 plots
@@ -94,7 +94,7 @@ if(num_2xN_plots != 0){
     
     dts <- dates_uniq[d:(p*N)]
   
-    gs.dummy <- gsplot() # needed to have layouts work, see gsplot github issue #404
+    gs.dummy <- gsplot(mar = c(5,2.6,4.5,0.6)) # needed to have layouts work, see gsplot github issue #404
     layout(plot_setup)
     for(t in seq_along(dts)){
       left_logic <- t == 1 #is it the farthest left plot
@@ -114,12 +114,17 @@ if(num_2xN_plots != 0){
     title(xlab = specifcond_title,
           outer = TRUE, line = -2)
     title(xlab = PH_title,
-          outer = TRUE, line = -24.5)
+          outer = TRUE, line = -24)
     title(xlab = h2otemp_title,
           outer = TRUE, line = -27.5)
     title(xlab = DO_title,
           outer = TRUE, line = -47.8)
-  
+    title(xlab = plot_sub_title, 
+          outer = TRUE, line = -49)
+    title(main = plot_main_title, 
+          outer = TRUE, line = -55)
+    
+    
     d <- (p*4)+1
   }
 } 
@@ -150,7 +155,7 @@ if(length(dts) > 0){
     ylabel_line <- 2
   }
   
-  gs.dummy <- gsplot() # needed to have layouts work, see gsplot github issue #404
+  gs.dummy <- gsplot(mar = c(5,2.6,4.5,0.6)) # needed to have layouts work, see gsplot github issue #404
   plot_setup <- matrix(1:(2*num_plots_on_page), 2, num_plots_on_page)
   layout(plot_setup)
 
@@ -180,13 +185,17 @@ if(length(dts) > 0){
   title(ylab = "DEPTH, IN METERS",
         outer = TRUE, line = ylabel_line)
   title(xlab = specifcond_title,
-        outer = TRUE, line = 1)
+        outer = TRUE, line = 2)
   title(xlab = PH_title,
-        outer = TRUE, line = -17.5)
+        outer = TRUE, line = -24)
   title(xlab = h2otemp_title,
-        outer = TRUE, line = -19.5)
+        outer = TRUE, line = -27.5)
   title(xlab = DO_title,
-        outer = TRUE, line = -37.5)
+        outer = TRUE, line = -47.8)
+  title(xlab = plot_sub_title, 
+          outer = TRUE, line = -49)
+    title(main = plot_main_title, 
+          outer = TRUE, line = -55)
 
 }
 
