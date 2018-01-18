@@ -110,19 +110,25 @@ if(num_2xN_plots != 0){
     
     #add titles around the plot
     title(ylab = "DEPTH, IN METERS",
-          outer = TRUE, line = -1)
+          outer = TRUE, 
+          line = -1)
     title(xlab = specifcond_title,
-          outer = TRUE, line = -2)
+          outer = TRUE, 
+          line = -2)
     title(xlab = PH_title,
-          outer = TRUE, line = -24)
+          outer = TRUE, 
+          line = -24)
     title(xlab = h2otemp_title,
-          outer = TRUE, line = -27.5)
+          outer = TRUE, 
+          line = -27.5)
     title(xlab = DO_title,
-          outer = TRUE, line = -47.8)
+          outer = TRUE, 
+          line = -47.8)
     title(xlab = plot_sub_title, 
-          outer = TRUE, line = -49)
+          outer = TRUE, 
+          line = -49)
     title(main = plot_main_title, 
-          outer = TRUE, line = -55)
+          outer = TRUE)
     
     
     d <- (p*4)+1
