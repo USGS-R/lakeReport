@@ -94,15 +94,16 @@ if(num_2xN_plots != 0){
     
     dts <- dates_uniq[d:(p*N)]
   
-    gs.dummy <- gsplot(mar = c(5,2.6,4.5,0.6)) # needed to have layouts work, see gsplot github issue #404
+    gs.setup.bottom <- gsplot(mar = c(4,2.6,5.5,0.6)) # needed to have layouts work, see gsplot github issue #404
+    gs.setup.top <- gsplot(mar = c(2,2.6,7.5,0.6))
     layout(plot_setup)
     for(t in seq_along(dts)){
       left_logic <- t == 1 #is it the farthest left plot
-      print(depthProfilePlot(gs.dummy, 
+      print(depthProfilePlot(gs.setup.top, 
                              side1 = h2otemp, side3 = DO, 
                              filter_date = dts[t], top = TRUE, 
                              left = left_logic, xranges = plotRanges))
-      print(depthProfilePlot(gs.dummy, 
+      print(depthProfilePlot(gs.setup.bottom, 
                              side1 = specifcond, side3 = PH, 
                              filter_date = dts[t], top = FALSE, 
                              left = left_logic, xranges = plotRanges))
