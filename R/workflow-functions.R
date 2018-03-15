@@ -25,7 +25,8 @@ makeReports <- function(siteNumber, wy, plotNames, output, ...){
       #generate a report for the current plotName (p) and siteNumber (s)
       status_report <- tryCatch(renderLakeReport(p, s, wy, output, ...), 
                                 error = function(e){
-                                  return(as.character(e))
+                                  err_msg <- gsub("\n", "", e)
+                                  return(err_msg)
                                 })
       if(grepl("Error", status_report)){
         failed_reports <- rbind(failed_reports, 
