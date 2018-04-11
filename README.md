@@ -103,6 +103,9 @@ Committing Changes
 6. Give your pull request (PR) a subject and a small description as necessary. If you are fixing a specific issue, reference that issue using `#` in the body of your PR. Then click "Create Pull Request".
 7. If you would like someone to review, call them out in a comment using `@` or assign the PR to them. Otherwise, click "Merge".
 
+##Installing Packages
+`install.packages(c("dataRetrieval","dplyr","lubridate","gsplot", "knitr"))`
+
 ##Disclaimer
 This software is in the public domain because it contains materials that originally came from the U.S. Geological Survey, an agency of the United States Department of Interior. For more information, see the [official USGS copyright policy](http://www.usgs.gov/visual-id/credit_usgs.html#copyright/ "official USGS copyright policy")
 

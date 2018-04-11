@@ -1,7 +1,7 @@
 # top-level functions 
 
 makeReports <- function(siteNumber, wy, plotNames, output, ...){
-  
+  library(rmarkdown)
   #if you want to run reports for all of the sites
   if(all(siteNumber == 'auto')){
     siteNumber_specified <- getSiteNumbers()
@@ -40,7 +40,6 @@ makeReports <- function(siteNumber, wy, plotNames, output, ...){
 }
 
 renderLakeReport <- function(plotName, siteNumber, wy, output, ...){
-  library(rmarkdown)
   
   if(plotName == 'stagehydrograph'){
     gageheight_filepath <- getGageHeightFilePath(siteNumber)

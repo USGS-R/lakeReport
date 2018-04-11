@@ -121,7 +121,7 @@ depthProfilePlot <- function(gs, side1, side3, filter_date,
     axis(side=3, at=side3, n.minor=xn.minor) %>% 
     
     # add dates title only to top plots
-    title(main = mainTitle, line = 3.5)
+    title(main = mainTitle, line = 4)
   
   # add legend to only plots on far left
   if(left){

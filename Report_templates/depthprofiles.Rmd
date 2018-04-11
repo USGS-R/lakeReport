@@ -82,7 +82,7 @@ isEven <- num_extra_plots%%2 == 0
 ```{r eval=isData, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis', fig.height = 6.5}
 
 #set plot options for margins (in order to fit text)
-par(oma = c(0,0,15,0) + 0.1,
+par(oma = c(0,0,50,0) + 0.1,
     mar = c(1,1,5,1) + 0.1)
 
 #2x5 plots
@@ -94,15 +94,16 @@ if(num_2xN_plots != 0){
     
     dts <- dates_uniq[d:(p*N)]
   
-    gs.dummy <- gsplot(mar = c(5,2.6,4.5,0.6)) # needed to have layouts work, see gsplot github issue #404
+    gs.setup.bottom <- gsplot(mar = c(4,2.6,5.5,0.6)) # needed to have layouts work, see gsplot github issue #404
+    gs.setup.top <- gsplot(mar = c(2,2.6,7.5,0.6))
     layout(plot_setup)
     for(t in seq_along(dts)){
       left_logic <- t == 1 #is it the farthest left plot
-      print(depthProfilePlot(gs.dummy, 
+      print(depthProfilePlot(gs.setup.top, 
                              side1 = h2otemp, side3 = DO, 
                              filter_date = dts[t], top = TRUE, 
                              left = left_logic, xranges = plotRanges))
-      print(depthProfilePlot(gs.dummy, 
+      print(depthProfilePlot(gs.setup.bottom, 
                              side1 = specifcond, side3 = PH, 
                              filter_date = dts[t], top = FALSE, 
                              left = left_logic, xranges = plotRanges))
@@ -110,19 +111,26 @@ if(num_2xN_plots != 0){
     
     #add titles around the plot
     title(ylab = "DEPTH, IN METERS",
-          outer = TRUE, line = -1)
+          outer = TRUE, 
+          line = -1)
     title(xlab = specifcond_title,
-          outer = TRUE, line = -2)
+          outer = TRUE, 
+          line = -2)
     title(xlab = PH_title,
-          outer = TRUE, line = -24)
+          outer = TRUE, 
+          line = -22)
     title(xlab = h2otemp_title,
-          outer = TRUE, line = -27.5)
+          outer = TRUE, 
+          line = -24.5)
     title(xlab = DO_title,
-          outer = TRUE, line = -47.8)
+          outer = TRUE, 
+          line = -44.8)
     title(xlab = plot_sub_title, 
-          outer = TRUE, line = -49)
+          outer = TRUE, 
+          line = -48)
     title(main = plot_main_title, 
-          outer = TRUE, line = -55)
+          outer = TRUE,
+          line = -1)
     
     
     d <- (p*4)+1
