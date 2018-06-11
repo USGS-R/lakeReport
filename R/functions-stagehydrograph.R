@@ -38,7 +38,7 @@ makeStageHydrograph_file <- function(stage_data, siteNumber, startDate){
     stage_data <- stage_data %>% 
       mutate(decimalDate = as.numeric(decimalDate)) %>% 
       mutate(dateTime = date_decimal(decimalDate)) %>%  
-      mutate(dateTime = as.Date(dateTime))
+      mutate(dateTime = as.POSIXct(dateTime))
   }
   #dplyr 0.5.0 filter not working
   # stage_data <- stage_data %>% filter(!is.na(dateTime))
