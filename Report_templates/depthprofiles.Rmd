@@ -165,12 +165,13 @@ if(length(dts) > 0){
   
   gs.setup.bottom <- gsplot(mar = c(4,2.6,5.5,0.6)) # needed to have layouts work, see gsplot github issue #404
   gs.setup.top <- gsplot(mar = c(2,2.6,7.5,0.6))
+  blank.plot <- gsplot(bty="n")
   plot_setup <- matrix(1:(2*num_plots_on_page), 2, num_plots_on_page)
   layout(plot_setup)
 
   for(b in 1:num_before_after){
-    plot.new()
-    plot.new()
+    print(blank.plot)
+    print(blank.plot)
   }
   
   for(t in seq_along(dts)){
@@ -186,8 +187,8 @@ if(length(dts) > 0){
   }
   
   for(b in 1:num_before_after){
-    plot.new()
-    plot.new()
+    print(blank.plot)
+    print(blank.plot)
   }
 
   #add titles around the plot
