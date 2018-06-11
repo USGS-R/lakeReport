@@ -194,7 +194,7 @@ if(length(dts) > 0){
   #add titles around the plot
   title(ylab = "DEPTH, IN METERS",
           outer = TRUE, 
-          line = -1)
+          line = ylabel_line)
     title(xlab = specifcond_title,
           outer = TRUE, 
           line = -2)
