@@ -4,7 +4,7 @@
 # pcode = 32210 for chlorophyll (ug/L)
 # pcode = 00078 for secchi depth (meters)
 
-filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
+filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE, isChlorophyll = FALSE){
   parm_data <- data %>% 
     filter(parm_cd %in% pcode) %>% 
     select(sample_dt, sample_tm, result_va, remark_cd, coll_ent_cd) %>% 
@@ -19,6 +19,13 @@ filterParmData <- function(data, pcode, depth_df = NULL, isTotalP = FALSE){
   }
   
   if(isTotalP){
+    parm_data <- parm_data %>% 
+      group_by(sample_dt) %>% 
+      filter(sample_depth == min(sample_depth)) %>% 
+      ungroup()
+  }
+  
+  if(isChlorophyll){
     parm_data <- parm_data %>% 
       group_by(sample_dt) %>% 
       filter(sample_depth == min(sample_depth)) %>% 
